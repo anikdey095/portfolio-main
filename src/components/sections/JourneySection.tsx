@@ -1,7 +1,12 @@
-import { journeyMilestones } from "@/data/journey";
+import { journeyMilestones as defaultJourney } from "@/data/journey";
+import type { JourneyMilestone } from "@/types/portfolio";
 import { GitBranch, CheckCircle2, ArrowDown } from "lucide-react";
 
-export function JourneySection() {
+export function JourneySection({
+  journeyMilestones = defaultJourney,
+}: {
+  journeyMilestones?: JourneyMilestone[];
+}) {
   return (
     <section id="journey" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-[var(--border-subtle)]">
       <div className="space-y-3 mb-16">

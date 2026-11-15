@@ -1,8 +1,8 @@
 import { GraduationCap, MapPin, Compass, Code2, Sparkles, ArrowUpRight, FileText } from "lucide-react";
 import { Github, Linkedin } from "@/components/ui/BrandIcons";
-import { profile } from "@/data/profile";
+import { profile as defaultProfile } from "@/data/profile";
 
-export function AboutSection() {
+export function AboutSection({ profile = defaultProfile }: { profile?: typeof defaultProfile }) {
   return (
     <section
       id="about"
@@ -24,28 +24,31 @@ export function AboutSection() {
         <div className="lg:col-span-7 space-y-6 text-base text-[var(--text-secondary)] leading-relaxed">
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-              Where I Started
+              Background &amp; Story
             </h3>
             <p>
-              I started my Computer Science &amp; Engineering degree at Metropolitan University in Sylhet focusing on C/C++, data structures, and competitive problem solving. Learning how to break messy problems into clean logic on Beecrowd and Codeforces gave me a strong appreciation for correctness and debugging when things don&apos;t work on the first try.
+              {profile.bio?.trim() ||
+                "I started my Computer Science & Engineering degree at Metropolitan University in Sylhet focusing on C/C++, data structures, and competitive problem solving."}
             </p>
           </div>
 
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-              Why AI &amp; Machine Learning
+              Near-Term Focus
             </h3>
             <p>
-              What drew me toward AI and Machine Learning was seeing how models can work on real-world problems where fixed rules fall short—like helping farmers pick crops from soil telemetry, classifying human emotion in text with neural sequence models, or building document Q&amp;A tools that cite their sources rather than guessing.
+              {profile.careerVision?.nearTerm?.trim() ||
+                "What drew me toward AI and Machine Learning was seeing how models can work on real-world problems where fixed rules fall short—like crop telemetry, emotion classification in text, and grounded document Q&A."}
             </p>
           </div>
 
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-              What I&apos;m Learning &amp; Where I&apos;m Headed
+              Long-Term Engineering Direction
             </h3>
             <p>
-              Right now, I spend most of my time studying PyTorch architectures, RAG retrieval pipelines, and lightweight Computer Vision inference—especially how perception models might assist drivers on unstructured roadways like those in Bangladesh. My goal is to keep growing into a reliable AI/ML Engineer through internships, open-source engineering, and prospective graduate research.
+              {profile.careerVision?.longTerm?.trim() ||
+                "My goal is to keep growing into a reliable AI/ML Engineer through internships, open-source engineering, and prospective graduate research."}
             </p>
           </div>
         </div>
@@ -94,7 +97,8 @@ export function AboutSection() {
                     Core Focus Areas
                   </div>
                   <div className="text-xs text-[var(--text-secondary)]">
-                    PyTorch, Computer Vision, NLP, RAG Pipelines, Python &amp; Next.js
+                    {profile.education?.currentFocus?.trim() ||
+                      "PyTorch, Computer Vision, NLP, RAG Pipelines, Python & Next.js"}
                   </div>
                 </div>
               </div>
@@ -106,7 +110,8 @@ export function AboutSection() {
                     Looking For
                   </div>
                   <div className="text-xs text-[var(--text-secondary)]">
-                    AI/ML Internships, Junior ML Roles &amp; Research Collaborations
+                    {profile.education?.targetPath?.trim() ||
+                      "AI/ML Internships, Junior ML Roles & Research Collaborations"}
                   </div>
                 </div>
               </div>

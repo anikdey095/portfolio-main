@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Mail, ArrowUpRight, GraduationCap, MapPin } from "lucide-react";
 import { Github, Linkedin } from "@/components/ui/BrandIcons";
-import { profile } from "@/data/profile";
+import { profile as defaultProfile } from "@/data/profile";
 
-export function Footer() {
+export function Footer({ profile = defaultProfile }: { profile?: typeof defaultProfile }) {
   return (
     <footer className="border-t border-[var(--border-subtle)] bg-[var(--bg-secondary)]/50 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -102,7 +102,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="/resume.pdf"
+                  href={profile.socials.resumeUrl || "/resume.pdf"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 text-cyan-400 hover:underline pt-1"

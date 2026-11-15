@@ -1,109 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
-import { profile as defaultProfile } from "@/data/profile";
-import { projects as defaultProjects } from "@/data/projects";
-import { researchCards as defaultResearch } from "@/data/research";
-import { skillCategories as defaultSkills } from "@/data/skills";
-import { verifiedMetrics as defaultMetrics } from "@/data/metrics";
-import { journeyMilestones as defaultJourney } from "@/data/journey";
+import { revalidatePath } from "next/cache";
+import { verifyAdminRequest } from "@/lib/adminAuth";
+import { connectToDatabase, sanitizeDbError } from "@/lib/mongodb";
+import {
+  isCloudinaryConfigured,
+  uploadAssetToCloudinary,
+  type UploadAssetKind,
+} from "@/lib/cloudinary";
+import {
+  ensurePortfolioInitialized,
+  getAdminPortfolioData,
+} from "@/lib/portfolioDb";
+import {
+  MessageModel,
+  ProfileModel,
+  ProjectModel,
+  ResearchModel,
+} from "@/models";
 
-const DATA_FILE = path.join(process.cwd(), "src", "data", "content.json");
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "anik@2026";
-
-function isAuthorized(req: NextRequest, bodyPassword?: unknown): boolean {
-  const headerPassword = req.headers.get("x-admin-password");
-  return (
-    headerPassword === ADMIN_PASSWORD ||
-    (typeof bodyPassword === "string" && bodyPassword === ADMIN_PASSWORD)
-  );
-}
-
-// Helper to read current database
-async function getStoredData() {
-  try {
-    const raw = await fs.readFile(DATA_FILE, "utf-8");
-    const parsed = JSON.parse(raw);
-    return {
-      profile: parsed.profile ? { ...defaultProfile, ...parsed.profile } : defaultProfile,
-      metrics: parsed.metrics || defaultMetrics,
-      projects: parsed.projects || defaultProjects,
-      research: parsed.research || defaultResearch,
-      skills: parsed.skills || defaultSkills,
-      journey: parsed.journey || defaultJourney,
-      messages: Array.isArray(parsed.messages) ? parsed.messages : [],
-    };
-  } catch {
-    return {
-      profile: defaultProfile,
-      metrics: defaultMetrics,
-      projects: defaultProjects,
-      research: defaultResearch,
-      skills: defaultSkills,
-      journey: defaultJourney,
-      messages: [],
-    };
-  }
-}
-
-// Helper to save to disk and sync TypeScript data modules
-async function saveStoredData(data: Record<string, unknown>) {
-  await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
-
-  const dataDir = path.join(process.cwd(), "src", "data");
-  await Promise.all([
-    fs.writeFile(
-      path.join(dataDir, "profile.ts"),
-      `export const profile = ${JSON.stringify(data.profile, null, 2)};\n`,
-      "utf-8"
-    ),
-    fs.writeFile(
-      path.join(dataDir, "metrics.ts"),
-      `import { VerifiedMetric } from "@/types/portfolio";\n\nexport const verifiedMetrics: VerifiedMetric[] = ${JSON.stringify(
-        data.metrics,
-        null,
-        2
-      )};\n`,
-      "utf-8"
-    ),
-    fs.writeFile(
-      path.join(dataDir, "projects.ts"),
-      `import { Project } from "@/types/portfolio";\n\nexport const projects: Project[] = ${JSON.stringify(
-        data.projects,
-        null,
-        2
-      )};\n`,
-      "utf-8"
-    ),
-    fs.writeFile(
-      path.join(dataDir, "research.ts"),
-      `import { ResearchCard } from "@/types/portfolio";\n\nexport const researchCards: ResearchCard[] = ${JSON.stringify(
-        data.research,
-        null,
-        2
-      )};\n`,
-      "utf-8"
-    ),
-    fs.writeFile(
-      path.join(dataDir, "skills.ts"),
-      `import { SkillCategory } from "@/types/portfolio";\n\nexport const skillCategories: SkillCategory[] = ${JSON.stringify(
-        data.skills,
-        null,
-        2
-      )};\n`,
-      "utf-8"
-    ),
-    fs.writeFile(
-      path.join(dataDir, "journey.ts"),
-      `import { JourneyMilestone } from "@/types/portfolio";\n\nexport const journeyMilestones: JourneyMilestone[] = ${JSON.stringify(
-        data.journey,
-        null,
-        2
-      )};\n`,
-      "utf-8"
-    ),
-  ]);
-}
+export const dynamic = "force-dynamic";
 
 function parseListField(val: unknown): string[] {
   if (Array.isArray(val)) {
@@ -115,261 +30,646 @@ function parseListField(val: unknown): string[] {
     .filter(Boolean);
 }
 
+function isNonEmptyString(val: unknown): val is string {
+  return typeof val === "string" && val.trim().length > 0;
+}
+
+function revalidatePortfolioRoutes(slug?: string) {
+  revalidatePath("/");
+  revalidatePath("/projects");
+  revalidatePath("/research");
+  revalidatePath("/api/data");
+  if (slug) {
+    revalidatePath(`/projects/${slug}`);
+  }
+}
+
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!verifyAdminRequest(req)) {
     return NextResponse.json(
       { success: false, message: "Unauthorized" },
       { status: 401 }
     );
   }
-  const data = await getStoredData();
-  return NextResponse.json(data);
+
+  try {
+    const data = await getAdminPortfolioData();
+    return NextResponse.json({
+      ...data,
+      integrations: {
+        cloudinaryConfigured: isCloudinaryConfigured(),
+        web3FormsConfigured: Boolean(
+          process.env.WEB3FORMS_ACCESS_KEY &&
+            !/YOUR_|placeholder/i.test(process.env.WEB3FORMS_ACCESS_KEY)
+        ),
+        vercelAnalyticsConfigured: Boolean(
+          process.env.VERCEL_API_TOKEN?.trim() &&
+            process.env.VERCEL_PROJECT_ID?.trim()
+        ),
+      },
+    });
+  } catch (err) {
+    console.error("Admin GET error:", sanitizeDbError(err));
+    return NextResponse.json(
+      { success: false, message: "Failed to load admin data from database." },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
+  if (!verifyAdminRequest(req)) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await req.json();
-    const { action, payload, password } = body;
-
-    if (!isAuthorized(req, password)) {
+    const { action, payload } = body || {};
+    if (!isNonEmptyString(action) || !payload || typeof payload !== "object") {
       return NextResponse.json(
-        { success: false, message: "Invalid admin password." },
-        { status: 401 }
+        { success: false, message: "Invalid admin action or payload." },
+        { status: 400 }
       );
     }
 
-    if (action === "VERIFY_AUTH") {
-      return NextResponse.json({ success: true, message: "Authenticated." });
-    }
-
-    const currentData = await getStoredData();
+    await connectToDatabase();
+    await ensurePortfolioInitialized();
 
     switch (action) {
       case "UPDATE_PROFILE": {
-        currentData.profile = { ...currentData.profile, ...payload.profile };
-        if (payload.metrics) {
-          currentData.metrics = payload.metrics;
+        if (!payload.profile || typeof payload.profile !== "object") {
+          return NextResponse.json(
+            { success: false, message: "Profile object is required." },
+            { status: 400 }
+          );
         }
-        await saveStoredData(currentData);
+
+        const p = payload.profile as Record<string, unknown>;
+        const updateSet: Record<string, unknown> = {};
+        if (isNonEmptyString(p.name)) updateSet.name = p.name.trim();
+        if (typeof p.avatar === "string") updateSet.avatar = p.avatar.trim();
+        if (isNonEmptyString(p.title)) updateSet.title = p.title.trim();
+        if (typeof p.subtitle === "string") updateSet.subtitle = p.subtitle.trim();
+        if (typeof p.bio === "string") updateSet.bio = p.bio.trim();
+        if (typeof p.location === "string") updateSet.location = p.location.trim();
+        if (p.education && typeof p.education === "object") {
+          updateSet.education = p.education;
+        }
+        if (p.careerVision && typeof p.careerVision === "object") {
+          updateSet.careerVision = p.careerVision;
+        }
+        if (p.audiences && typeof p.audiences === "object") {
+          updateSet.audiences = p.audiences;
+        }
+        if (p.socials && typeof p.socials === "object") {
+          updateSet.socials = p.socials;
+        }
+        if (Array.isArray(payload.metrics)) {
+          updateSet.metrics = payload.metrics;
+        }
+
+        await ProfileModel.updateOne(
+          { key: "main" },
+          { $set: updateSet },
+          { upsert: true, runValidators: true }
+        );
+
+        revalidatePortfolioRoutes();
         return NextResponse.json({
           success: true,
-          message: "Profile & metrics updated and synced!",
+          message: "Profile & metrics updated in MongoDB!",
         });
       }
 
       case "ADD_PROJECT": {
-        const slug =
-          payload.slug ||
-          String(payload.title || "project")
+        if (!isNonEmptyString(payload.title)) {
+          return NextResponse.json(
+            { success: false, message: "Project title is required." },
+            { status: 400 }
+          );
+        }
+
+        const rawSlug =
+          (isNonEmptyString(payload.slug) ? payload.slug.trim() : "") ||
+          String(payload.title)
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/^-|-$/g, "");
+        const slug = rawSlug || `proj-${Date.now()}`;
+        const id = isNonEmptyString(payload.id) ? payload.id.trim() : slug;
+
+        const existing = await ProjectModel.exists({
+          $or: [{ slug }, { id }],
+        });
+        if (existing) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: "A project with this slug or id already exists.",
+            },
+            { status: 409 }
+          );
+        }
+
+        const projectCount = await ProjectModel.countDocuments();
         const newProject = {
-          id: slug || `proj-${Date.now()}`,
-          slug: slug || `proj-${Date.now()}`,
-          title: payload.title,
-          tagline: payload.tagline || "",
-          summary: payload.summary || "",
-          problem: payload.problem || "",
-          approach: payload.approach || "",
-          challenges: payload.challenges || "",
+          id,
+          slug,
+          title: payload.title.trim(),
+          tagline: String(payload.tagline || "").trim(),
+          summary: String(payload.summary || "").trim(),
+          problem: String(payload.problem || "").trim(),
+          approach: String(payload.approach || "").trim(),
+          challenges: String(payload.challenges || "").trim(),
           category: payload.category || "Deep Learning",
           domain: payload.domain || "Applied AI",
           status: payload.status || "Completed",
           featured: Boolean(payload.featured),
-          featuredOrder: Number(payload.featuredOrder) || currentData.projects.length + 1,
+          featuredOrder:
+            Number.isFinite(Number(payload.featuredOrder)) &&
+            Number(payload.featuredOrder) > 0
+              ? Number(payload.featuredOrder)
+              : projectCount + 1,
           stack: parseListField(payload.stack),
-          githubUrl: payload.githubUrl || "",
-          demoUrl: payload.demoUrl || "",
+          githubUrl: String(payload.githubUrl || "").trim(),
+          demoUrl: String(payload.demoUrl || "").trim(),
+          paperUrl: String(payload.paperUrl || "").trim(),
+          imageUrl: String(payload.imageUrl || "").trim(),
+          galleryImages: Array.isArray(payload.galleryImages)
+            ? payload.galleryImages.map((u: unknown) => String(u).trim()).filter(Boolean)
+            : parseListField(payload.galleryImages),
+          metrics: Array.isArray(payload.metrics) ? payload.metrics : [],
           highlights:
             Array.isArray(payload.highlights) && payload.highlights.length > 0
               ? payload.highlights
-              : [payload.summary || "Initial deployment"],
+              : [String(payload.summary || "Initial deployment")],
           keyArchitecture:
-            payload.keyArchitecture || "Pipeline: Input -> Model -> Output",
+            String(payload.keyArchitecture || "").trim() ||
+            "Pipeline: Input -> Model -> Output",
           hasDetailedCaseStudy: Boolean(payload.hasDetailedCaseStudy),
         };
 
-        currentData.projects = [newProject, ...currentData.projects];
-        await saveStoredData(currentData);
+        await ProjectModel.create(newProject);
+        revalidatePortfolioRoutes(slug);
         return NextResponse.json({
           success: true,
-          message: "Project added and synced!",
+          project: newProject,
+          message: "Project saved to MongoDB!",
         });
       }
 
       case "UPDATE_PROJECT": {
         if (Array.isArray(payload.projects)) {
-          currentData.projects = payload.projects;
-        } else {
-          currentData.projects = currentData.projects.map(
-            (proj: Record<string, unknown>) => {
-              if (proj.id !== payload.id && proj.slug !== payload.id) {
-                return proj;
-              }
-              return {
-                ...proj,
-                ...payload,
-                stack:
-                  payload.stack !== undefined
-                    ? parseListField(payload.stack)
-                    : proj.stack,
-                highlights:
-                  payload.highlights !== undefined
-                    ? Array.isArray(payload.highlights)
-                      ? payload.highlights
-                      : parseListField(payload.highlights)
-                    : proj.highlights,
-              };
+          for (let i = 0; i < payload.projects.length; i++) {
+            const proj = payload.projects[i] as Record<string, unknown>;
+            if (!isNonEmptyString(proj?.id) && !isNonEmptyString(proj?.slug)) {
+              continue;
             }
+            const identifier = isNonEmptyString(proj.id)
+              ? proj.id.trim()
+              : String(proj.slug).trim();
+            await ProjectModel.updateOne(
+              { $or: [{ id: identifier }, { slug: identifier }] },
+              {
+                $set: {
+                  title: isNonEmptyString(proj.title) ? proj.title.trim() : undefined,
+                  featured: Boolean(proj.featured),
+                  featuredOrder:
+                    Number.isFinite(Number(proj.featuredOrder))
+                      ? Number(proj.featuredOrder)
+                      : i + 1,
+                },
+              }
+            );
+          }
+          revalidatePortfolioRoutes();
+          return NextResponse.json({
+            success: true,
+            message: "Projects updated in MongoDB!",
+          });
+        }
+
+        if (!isNonEmptyString(payload.title)) {
+          return NextResponse.json(
+            { success: false, message: "Project title is required." },
+            { status: 400 }
           );
         }
-        await saveStoredData(currentData);
+        if (!isNonEmptyString(payload.id)) {
+          return NextResponse.json(
+            { success: false, message: "Project id is required." },
+            { status: 400 }
+          );
+        }
+
+        const updateSet: Record<string, unknown> = {
+          title: payload.title.trim(),
+        };
+        if (isNonEmptyString(payload.slug)) updateSet.slug = payload.slug.trim();
+        if (typeof payload.tagline === "string")
+          updateSet.tagline = payload.tagline.trim();
+        if (typeof payload.summary === "string")
+          updateSet.summary = payload.summary.trim();
+        if (typeof payload.problem === "string")
+          updateSet.problem = payload.problem.trim();
+        if (typeof payload.approach === "string")
+          updateSet.approach = payload.approach.trim();
+        if (typeof payload.challenges === "string")
+          updateSet.challenges = payload.challenges.trim();
+        if (isNonEmptyString(payload.category))
+          updateSet.category = payload.category.trim();
+        if (typeof payload.domain === "string")
+          updateSet.domain = payload.domain.trim();
+        if (isNonEmptyString(payload.status))
+          updateSet.status = payload.status.trim();
+        if (payload.featured !== undefined)
+          updateSet.featured = Boolean(payload.featured);
+        if (
+          payload.featuredOrder !== undefined &&
+          Number.isFinite(Number(payload.featuredOrder))
+        ) {
+          updateSet.featuredOrder = Number(payload.featuredOrder);
+        }
+        if (payload.stack !== undefined)
+          updateSet.stack = parseListField(payload.stack);
+        if (typeof payload.githubUrl === "string")
+          updateSet.githubUrl = payload.githubUrl.trim();
+        if (typeof payload.demoUrl === "string")
+          updateSet.demoUrl = payload.demoUrl.trim();
+        if (typeof payload.paperUrl === "string")
+          updateSet.paperUrl = payload.paperUrl.trim();
+        if (typeof payload.imageUrl === "string")
+          updateSet.imageUrl = payload.imageUrl.trim();
+        if (payload.galleryImages !== undefined) {
+          updateSet.galleryImages = Array.isArray(payload.galleryImages)
+            ? payload.galleryImages.map((u: unknown) => String(u).trim()).filter(Boolean)
+            : parseListField(payload.galleryImages);
+        }
+        if (typeof payload.keyArchitecture === "string")
+          updateSet.keyArchitecture = payload.keyArchitecture.trim();
+        if (Array.isArray(payload.metrics)) updateSet.metrics = payload.metrics;
+        if (payload.highlights !== undefined) {
+          updateSet.highlights = Array.isArray(payload.highlights)
+            ? payload.highlights
+            : parseListField(payload.highlights);
+        }
+        if (payload.hasDetailedCaseStudy !== undefined) {
+          updateSet.hasDetailedCaseStudy = Boolean(payload.hasDetailedCaseStudy);
+        }
+
+        const updated = await ProjectModel.findOneAndUpdate(
+          { $or: [{ id: payload.id }, { slug: payload.id }] },
+          { $set: updateSet },
+          { returnDocument: "after", runValidators: true }
+        ).lean();
+
+        if (!updated) {
+          return NextResponse.json(
+            { success: false, message: "Project not found." },
+            { status: 404 }
+          );
+        }
+
+        revalidatePortfolioRoutes(String(updateSet.slug || payload.id));
         return NextResponse.json({
           success: true,
-          message: "Project updated and synced!",
+          message: "Project updated in MongoDB!",
         });
       }
 
       case "DELETE_PROJECT": {
-        currentData.projects = currentData.projects.filter(
-          (p: { id: string; slug: string }) =>
-            p.id !== payload.id && p.slug !== payload.id
-        );
-        await saveStoredData(currentData);
+        if (!isNonEmptyString(payload.id)) {
+          return NextResponse.json(
+            { success: false, message: "Project id is required." },
+            { status: 400 }
+          );
+        }
+        const delRes = await ProjectModel.deleteOne({
+          $or: [{ id: payload.id }, { slug: payload.id }],
+        });
+        if (delRes.deletedCount === 0) {
+          return NextResponse.json(
+            { success: false, message: "Project not found." },
+            { status: 404 }
+          );
+        }
+        revalidatePortfolioRoutes(String(payload.id));
         return NextResponse.json({
           success: true,
-          message: "Project deleted!",
+          message: "Project deleted from MongoDB!",
         });
       }
 
       case "ADD_RESEARCH": {
+        if (!isNonEmptyString(payload.title)) {
+          return NextResponse.json(
+            { success: false, message: "Research title is required." },
+            { status: 400 }
+          );
+        }
+
+        const id = isNonEmptyString(payload.id)
+          ? payload.id.trim()
+          : `research-${Date.now()}`;
+        const existing = await ResearchModel.exists({ id });
+        if (existing) {
+          return NextResponse.json(
+            { success: false, message: "Research id already exists." },
+            { status: 409 }
+          );
+        }
+
+        const earliest = await ResearchModel.findOne({})
+          .sort({ order: 1 })
+          .select("order")
+          .lean<{ order?: number }>();
+        const nextOrder =
+          typeof earliest?.order === "number" ? earliest.order - 1 : 0;
+
         const newResearch = {
-          id: payload.id || `research-${Date.now()}`,
-          title: payload.title,
-          tagline: payload.tagline || "",
+          id,
+          title: payload.title.trim(),
+          tagline: String(payload.tagline || "").trim(),
           status: payload.status || "Exploring",
           domain: payload.domain || "Computer Vision",
-          targetOutcome: payload.targetOutcome || "Academic Thesis & Proposal",
-          problem: payload.problem || "",
-          researchQuestion: payload.researchQuestion || "",
-          whyItMatters: payload.whyItMatters || "",
+          targetOutcome:
+            payload.targetOutcome || "Academic Thesis & Proposal",
+          problem: String(payload.problem || "").trim(),
+          researchQuestion: String(payload.researchQuestion || "").trim(),
+          whyItMatters: String(payload.whyItMatters || "").trim(),
           existingApproaches:
             payload.existingApproaches || "Standard baseline models",
           researchGap:
             payload.researchGap || "Domain shift and dataset constraints",
-          proposedDirection: payload.proposedDirection || "",
+          proposedDirection: String(payload.proposedDirection || "").trim(),
           experiments: payload.experiments || "Benchmarking protocols",
           currentResults: payload.currentResults || "Formulation stage",
           limitations: payload.limitations || "Preliminary exploration",
           futureWork: payload.futureWork || "Prospective graduate research",
           tags: parseListField(payload.tags),
+          statusNote: typeof payload.statusNote === "string" ? payload.statusNote.trim() : "",
+          order: nextOrder,
         };
 
-        currentData.research = [newResearch, ...currentData.research];
-        await saveStoredData(currentData);
+        await ResearchModel.create(newResearch);
+        revalidatePortfolioRoutes();
         return NextResponse.json({
           success: true,
-          message: "Research direction added and synced!",
+          research: newResearch,
+          message: "Research direction saved to MongoDB!",
         });
       }
 
       case "UPDATE_RESEARCH": {
-        currentData.research = currentData.research.map(
-          (item: Record<string, unknown>) => {
-            if (item.id !== payload.id) return item;
-            return {
-              ...item,
-              ...payload,
-              tags:
-                payload.tags !== undefined
-                  ? parseListField(payload.tags)
-                  : item.tags,
-            };
-          }
-        );
-        await saveStoredData(currentData);
+        if (!isNonEmptyString(payload.title) || !isNonEmptyString(payload.id)) {
+          return NextResponse.json(
+            { success: false, message: "Research id and title are required." },
+            { status: 400 }
+          );
+        }
+
+        const updateSet: Record<string, unknown> = {
+          title: payload.title.trim(),
+        };
+        if (typeof payload.tagline === "string")
+          updateSet.tagline = payload.tagline.trim();
+        if (isNonEmptyString(payload.status))
+          updateSet.status = payload.status.trim();
+        if (typeof payload.domain === "string")
+          updateSet.domain = payload.domain.trim();
+        if (typeof payload.targetOutcome === "string")
+          updateSet.targetOutcome = payload.targetOutcome.trim();
+        if (typeof payload.problem === "string")
+          updateSet.problem = payload.problem.trim();
+        if (typeof payload.researchQuestion === "string")
+          updateSet.researchQuestion = payload.researchQuestion.trim();
+        if (typeof payload.whyItMatters === "string")
+          updateSet.whyItMatters = payload.whyItMatters.trim();
+        if (typeof payload.existingApproaches === "string")
+          updateSet.existingApproaches = payload.existingApproaches.trim();
+        if (typeof payload.researchGap === "string")
+          updateSet.researchGap = payload.researchGap.trim();
+        if (typeof payload.proposedDirection === "string")
+          updateSet.proposedDirection = payload.proposedDirection.trim();
+        if (typeof payload.experiments === "string")
+          updateSet.experiments = payload.experiments.trim();
+        if (typeof payload.currentResults === "string")
+          updateSet.currentResults = payload.currentResults.trim();
+        if (typeof payload.limitations === "string")
+          updateSet.limitations = payload.limitations.trim();
+        if (typeof payload.futureWork === "string")
+          updateSet.futureWork = payload.futureWork.trim();
+        if (typeof payload.statusNote === "string")
+          updateSet.statusNote = payload.statusNote.trim();
+        if (payload.tags !== undefined)
+          updateSet.tags = parseListField(payload.tags);
+
+        const updated = await ResearchModel.findOneAndUpdate(
+          { id: payload.id },
+          { $set: updateSet },
+          { returnDocument: "after", runValidators: true }
+        ).lean();
+
+        if (!updated) {
+          return NextResponse.json(
+            { success: false, message: "Research card not found." },
+            { status: 404 }
+          );
+        }
+
+        revalidatePortfolioRoutes();
         return NextResponse.json({
           success: true,
-          message: "Research agenda updated!",
+          message: "Research direction updated in MongoDB!",
         });
       }
 
       case "DELETE_RESEARCH": {
-        currentData.research = currentData.research.filter(
-          (r: { id: string }) => r.id !== payload.id
-        );
-        await saveStoredData(currentData);
+        if (!isNonEmptyString(payload.id)) {
+          return NextResponse.json(
+            { success: false, message: "Research id is required." },
+            { status: 400 }
+          );
+        }
+        const delRes = await ResearchModel.deleteOne({ id: payload.id });
+        if (delRes.deletedCount === 0) {
+          return NextResponse.json(
+            { success: false, message: "Research card not found." },
+            { status: 404 }
+          );
+        }
+        revalidatePortfolioRoutes();
         return NextResponse.json({
           success: true,
-          message: "Research card removed!",
+          message: "Research card removed from MongoDB!",
         });
       }
 
       case "UPDATE_SKILLS": {
-        currentData.skills = Array.isArray(payload.skills)
-          ? payload.skills
-          : currentData.skills;
-        await saveStoredData(currentData);
+        if (!Array.isArray(payload.skills)) {
+          return NextResponse.json(
+            { success: false, message: "Skills array is required." },
+            { status: 400 }
+          );
+        }
+        await ProfileModel.updateOne(
+          { key: "main" },
+          { $set: { skills: payload.skills } },
+          { upsert: true }
+        );
+        revalidatePortfolioRoutes();
         return NextResponse.json({
           success: true,
-          message: "Technical skills updated and synced!",
+          message: "Technical skills updated in MongoDB!",
         });
       }
 
       case "UPDATE_JOURNEY": {
-        currentData.journey = Array.isArray(payload.journey)
-          ? payload.journey
-          : currentData.journey;
-        await saveStoredData(currentData);
+        if (!Array.isArray(payload.journey)) {
+          return NextResponse.json(
+            { success: false, message: "Journey array is required." },
+            { status: 400 }
+          );
+        }
+        await ProfileModel.updateOne(
+          { key: "main" },
+          { $set: { journey: payload.journey } },
+          { upsert: true }
+        );
+        revalidatePortfolioRoutes();
         return NextResponse.json({
           success: true,
-          message: "Learning journey updated and synced!",
+          message: "Learning journey updated in MongoDB!",
         });
       }
 
       case "DELETE_MESSAGE": {
-        const existingMessages = Array.isArray(currentData.messages)
-          ? currentData.messages
-          : [];
-        currentData.messages = existingMessages.filter(
-          (m: { id: string }) => m.id !== payload.id
-        );
-        await saveStoredData(currentData);
+        if (!isNonEmptyString(payload.id)) {
+          return NextResponse.json(
+            { success: false, message: "Message id is required." },
+            { status: 400 }
+          );
+        }
+        const delRes = await MessageModel.deleteOne({ id: payload.id });
+        if (delRes.deletedCount === 0) {
+          return NextResponse.json(
+            { success: false, message: "Message not found." },
+            { status: 404 }
+          );
+        }
         return NextResponse.json({
           success: true,
-          message: "Message deleted!",
+          message: "Message deleted from MongoDB!",
         });
       }
 
       case "UPLOAD_FILE": {
-        const { fileType, base64Data } = payload;
-        const buffer = Buffer.from(
-          String(base64Data).split(",")[1] || String(base64Data),
-          "base64"
-        );
+        const { fileType, base64Data, slug, projectId } = payload;
+        const allowedTypes: UploadAssetKind[] = [
+          "avatar",
+          "resume",
+          "projectCover",
+          "projectGallery",
+        ];
+        if (!allowedTypes.includes(fileType as UploadAssetKind)) {
+          return NextResponse.json(
+            { success: false, message: "Invalid upload fileType." },
+            { status: 400 }
+          );
+        }
+        if (!isNonEmptyString(base64Data)) {
+          return NextResponse.json(
+            { success: false, message: "base64Data is required." },
+            { status: 400 }
+          );
+        }
 
-        if (fileType === "avatar") {
-          const avatarPath = path.join(process.cwd(), "public", "profile.jpg");
-          await fs.writeFile(avatarPath, buffer);
-          currentData.profile.avatar = "/profile.jpg";
-          await saveStoredData(currentData);
-          return NextResponse.json({
-            success: true,
-            message: "Profile picture uploaded & replaced successfully!",
+        if (!isCloudinaryConfigured()) {
+          return NextResponse.json(
+            {
+              success: false,
+              message:
+                "Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in environment variables.",
+            },
+            { status: 503 }
+          );
+        }
+
+        const kind = fileType as UploadAssetKind;
+        let uploaded: { secureUrl: string; publicId: string };
+        try {
+          uploaded = await uploadAssetToCloudinary(kind, base64Data, {
+            slug: isNonEmptyString(slug) ? slug : undefined,
           });
-        } else if (fileType === "resume") {
-          const resumePath = path.join(process.cwd(), "public", "resume.pdf");
-          await fs.writeFile(resumePath, buffer);
+        } catch (uploadErr) {
+          const msg =
+            uploadErr instanceof Error
+              ? uploadErr.message
+              : "Cloudinary upload failed.";
+          const isValidationErr =
+            /required|empty|invalid|under|must be|unsupported|signature/i.test(
+              msg
+            );
+          return NextResponse.json(
+            { success: false, message: msg },
+            { status: isValidationErr ? 400 : 502 }
+          );
+        }
+
+        if (kind === "avatar") {
+          await ProfileModel.updateOne(
+            { key: "main" },
+            { $set: { avatar: uploaded.secureUrl } },
+            { upsert: true }
+          );
+          revalidatePortfolioRoutes();
           return NextResponse.json({
             success: true,
-            message: "Resume PDF uploaded & replaced successfully!",
+            secureUrl: uploaded.secureUrl,
+            message: "Profile picture uploaded to Cloudinary & saved!",
           });
         }
-        return NextResponse.json(
-          { success: false, message: "Unknown file type" },
-          { status: 400 }
-        );
+
+        if (kind === "resume") {
+          await ProfileModel.updateOne(
+            { key: "main" },
+            { $set: { "socials.resumeUrl": uploaded.secureUrl } },
+            { upsert: true }
+          );
+          revalidatePortfolioRoutes();
+          return NextResponse.json({
+            success: true,
+            secureUrl: uploaded.secureUrl,
+            message: "Resume PDF uploaded to Cloudinary & saved!",
+          });
+        }
+
+        if (isNonEmptyString(projectId)) {
+          if (kind === "projectCover") {
+            await ProjectModel.updateOne(
+              { $or: [{ id: projectId }, { slug: projectId }] },
+              { $set: { imageUrl: uploaded.secureUrl } }
+            );
+          } else {
+            await ProjectModel.updateOne(
+              { $or: [{ id: projectId }, { slug: projectId }] },
+              { $push: { galleryImages: uploaded.secureUrl } }
+            );
+          }
+          revalidatePortfolioRoutes(String(slug || projectId));
+        }
+
+        return NextResponse.json({
+          success: true,
+          secureUrl: uploaded.secureUrl,
+          message:
+            kind === "projectCover"
+              ? "Project cover image uploaded to Cloudinary!"
+              : "Project gallery image uploaded to Cloudinary!",
+        });
       }
 
       default:
@@ -379,7 +679,7 @@ export async function POST(req: NextRequest) {
         );
     }
   } catch (error) {
-    console.error("Admin API error:", error);
+    console.error("Admin API error:", sanitizeDbError(error));
     return NextResponse.json(
       { success: false, message: "Failed to process update" },
       { status: 500 }

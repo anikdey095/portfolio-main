@@ -36,6 +36,8 @@ export interface Project {
   githubUrl?: string;
   demoUrl?: string;
   paperUrl?: string;
+  imageUrl?: string;
+  galleryImages?: string[];
   metrics?: ProjectMetric[];
   highlights: string[];
   problem?: string;

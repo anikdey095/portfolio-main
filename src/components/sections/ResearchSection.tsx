@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { researchCards } from "@/data/research";
+import { researchCards as defaultResearch } from "@/data/research";
+import type { ResearchCard } from "@/types/portfolio";
 import { FlaskConical, ChevronDown, ChevronUp, AlertCircle, Sparkles, BookOpen, Compass } from "lucide-react";
 
-export function ResearchSection() {
+export function ResearchSection({
+  researchCards = defaultResearch,
+}: {
+  researchCards?: ResearchCard[];
+}) {
   const [expandedId, setExpandedId] = useState<string>(researchCards[0]?.id || "");
 
   const toggleExpand = (id: string) => {

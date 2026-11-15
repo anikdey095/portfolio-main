@@ -1,17 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, FileText, Send, CheckCircle2, ArrowUpRight, Terminal, ExternalLink } from "lucide-react";
+import { Mail, FileText, Send, CheckCircle2, ArrowUpRight, Terminal, AlertCircle } from "lucide-react";
 import { Github, Linkedin } from "@/components/ui/BrandIcons";
-import { profile } from "@/data/profile";
+import { profile as defaultProfile } from "@/data/profile";
 
-interface DeliveryState {
-  emailed: boolean;
-  gmailUrl: string;
-  mailtoUrl: string;
-}
-
-export function ContactSection() {
+export function ContactSection({ profile = defaultProfile }: { profile?: typeof defaultProfile }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,8 +13,7 @@ export function ContactSection() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [deliveryState, setDeliveryState] = useState<DeliveryState | null>(null);
+  const [statusMessage, setStatusMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,29 +25,18 @@ export function ContactSection() {
 
     if (!cleanName || !cleanEmail || !cleanMessage) {
       setStatus("error");
-      setErrorMessage("Please complete all required fields before sending.");
+      setStatusMessage("Please complete all required fields before sending.");
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       setStatus("error");
-      setErrorMessage("Please enter a valid email address.");
+      setStatusMessage("Please enter a valid email address.");
       return;
     }
 
     setStatus("submitting");
-    setErrorMessage("");
-
-    const emailSubject = cleanSubject || `Portfolio Inquiry from ${cleanName}`;
-    const emailBody = `Name: ${cleanName}\nEmail: ${cleanEmail}\n\nMessage:\n${cleanMessage}`;
-
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
-      profile.socials.email
-    )}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-
-    const mailtoUrl = `mailto:${profile.socials.email}?subject=${encodeURIComponent(
-      emailSubject
-    )}&body=${encodeURIComponent(emailBody)}`;
+    setStatusMessage("");
 
     try {
       const res = await fetch("/api/contact", {
@@ -69,24 +51,25 @@ export function ContactSection() {
       });
       const result = await res.json();
 
-      if (!res.ok || !result.success) {
-        setStatus("error");
-        setErrorMessage(
-          result.message || "Could not send message automatically. Please try again or email directly."
+      if (res.ok && result?.success === true) {
+        setStatus("success");
+        setStatusMessage(
+          result.message || `Your message has been delivered directly to ${profile.socials.email}.`
         );
+        setFormData({ name: "", email: "", subject: "", message: "" });
         return;
       }
 
-      setDeliveryState({
-        emailed: Boolean(result.emailed),
-        gmailUrl,
-        mailtoUrl,
-      });
-      setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setStatus("error");
+      setStatusMessage(
+        result?.message ||
+          `Failed to deliver your email. Please contact ${profile.socials.email} directly.`
+      );
     } catch {
       setStatus("error");
-      setErrorMessage("Network error while sending message. Please try again or email directly.");
+      setStatusMessage(
+        `Network error while sending message. Please contact ${profile.socials.email} directly.`
+      );
     }
   };
 
@@ -174,7 +157,7 @@ export function ContactSection() {
             </a>
 
             <a
-              href="/resume.pdf"
+              href={profile.socials.resumeUrl || "/resume.pdf"}
               target="_blank"
               rel="noopener noreferrer"
               className="p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-950/40 transition-all flex items-center justify-between group"
@@ -208,46 +191,21 @@ export function ContactSection() {
                 Send Me a Message
               </h3>
               <span className="text-[11px] font-mono text-[var(--text-muted)] flex items-center gap-1">
-                <Terminal className="w-3 h-3 text-[#0ea5e9]" /> Inbox + Gmail Delivery
+                <Terminal className="w-3 h-3 text-[#0ea5e9]" /> Direct Gmail Delivery
               </span>
             </div>
 
-            {status === "error" && (
-              <div className="p-3 rounded-lg bg-red-950/40 border border-red-500/30 text-xs text-red-300 font-mono">
-                {errorMessage}
+            {status === "error" && statusMessage && (
+              <div className="p-3.5 rounded-xl bg-red-950/40 border border-red-500/30 text-xs text-red-300 font-mono flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <span>{statusMessage}</span>
               </div>
             )}
 
-            {status === "success" && deliveryState && (
-              <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-300 space-y-3">
-                <div className="flex items-start gap-2 font-mono">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>
-                    {deliveryState.emailed
-                      ? `Message sent directly to ${profile.socials.email} and saved to the portfolio inbox.`
-                      : "Message saved to portfolio inbox! You can also send a copy directly via Gmail below:"}
-                  </span>
-                </div>
-                {!deliveryState.emailed && (
-                  <div className="flex flex-wrap gap-2.5 pl-6">
-                    <a
-                      href={deliveryState.gmailUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0ea5e9] hover:bg-sky-400 text-slate-950 font-semibold transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Send via Gmail (Browser)</span>
-                    </a>
-                    <a
-                      href={deliveryState.mailtoUrl}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-200 font-medium transition-colors"
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Open Email App (mailto)</span>
-                    </a>
-                  </div>
-                )}
+            {status === "success" && statusMessage && (
+              <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-300 font-mono flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span>{statusMessage}</span>
               </div>
             )}
 
@@ -259,6 +217,7 @@ export function ContactSection() {
                 <input
                   type="text"
                   required
+                  maxLength={120}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. Dr. Jane Smith / Recruiter"
@@ -273,6 +232,7 @@ export function ContactSection() {
                 <input
                   type="email"
                   required
+                  maxLength={160}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="name@organization.com"
@@ -287,6 +247,7 @@ export function ContactSection() {
               </label>
               <input
                 type="text"
+                maxLength={200}
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="AI Engineering Role / Graduate Research Discussion"
@@ -301,6 +262,7 @@ export function ContactSection() {
               <textarea
                 rows={5}
                 required
+                maxLength={5000}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Share project details, research collaboration ideas, or interview scheduling..."

@@ -4,7 +4,9 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Download, Sparkles } from "lucide-react";
-import { profile } from "@/data/profile";
+import { profile as defaultProfile } from "@/data/profile";
+import { verifiedMetrics as defaultMetrics } from "@/data/metrics";
+import type { VerifiedMetric } from "@/types/portfolio";
 import { MobileHeroVisual } from "./MobileHeroVisual";
 
 const NeuralScene = dynamic(
@@ -30,7 +32,24 @@ const heroHighlights = [
   },
 ];
 
-export function Hero() {
+export function Hero({
+  profile = defaultProfile,
+  metrics = defaultMetrics,
+}: {
+  profile?: typeof defaultProfile;
+  metrics?: VerifiedMetric[];
+}) {
+  const displayMetrics =
+    Array.isArray(metrics) && metrics.length > 0
+      ? metrics.slice(0, 3)
+      : heroHighlights;
+
+  const badgeText = profile.title?.trim() || "CSE Student · Aspiring AI/ML Engineer";
+  const heroDescription =
+    profile.subtitle?.trim() ||
+    profile.bio?.trim() ||
+    "I'm an undergraduate Computer Science student at Metropolitan University exploring Machine Learning, Computer Vision, and RAG systems—learning through real code, honest experiments, and practical engineering.";
+
   return (
     <section className="relative min-h-[92vh] flex flex-col justify-between pt-28 pb-10 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Subtle 3D Constellation & Deep Navy Radial Glow */}
@@ -43,7 +62,7 @@ export function Hero() {
         <div className="lg:col-span-7 space-y-7 text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[var(--border-subtle)] bg-[var(--bg-secondary)]/80 text-xs font-medium text-[var(--text-secondary)]">
             <Sparkles className="w-3.5 h-3.5 text-[#0ea5e9]" />
-            <span>CSE Student · Aspiring AI/ML Engineer</span>
+            <span>{badgeText}</span>
           </div>
 
           <div className="space-y-4">
@@ -53,7 +72,7 @@ export function Hero() {
             </h1>
 
             <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-xl">
-              I&apos;m an undergraduate Computer Science student at Metropolitan University exploring Machine Learning, Computer Vision, and RAG systems—learning through real code, honest experiments, and practical engineering.
+              {heroDescription}
             </p>
           </div>
 
@@ -110,7 +129,7 @@ export function Hero() {
       {/* Verified Highlight Metrics Strip + Scroll Mouse Indicator */}
       <div className="relative z-10 w-full max-w-5xl mx-auto mt-14 space-y-10">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-          {heroHighlights.map((item) => (
+          {displayMetrics.map((item) => (
             <div key={item.label} className="space-y-1">
               <div className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0ea5e9]">
                 {item.value}

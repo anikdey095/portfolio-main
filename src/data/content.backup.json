@@ -1,0 +1,843 @@
+{
+  "profile": {
+    "name": "Anik Dey",
+    "avatar": "/profile.jpg",
+    "title": "Aspiring AI / ML Engineer",
+    "subtitle": "Building practical AI applications across machine learning, deep learning, NLP, computer vision, and retrieval-augmented generation (RAG).",
+    "bio": "Computer Science and Engineering undergraduate at Metropolitan University, Sylhet, Bangladesh, and competitive programmer. I build and deploy end-to-end AI applications — from a Random Forest crop recommender and a BiGRU emotion classifier to a multi-PDF RAG chatbot and in-browser object detection — while strengthening my foundations in data structures, algorithms, and neural networks.",
+    "location": "Sylhet, Bangladesh",
+    "education": {
+      "degree": "B.Sc. in Computer Science and Engineering",
+      "institution": "Metropolitan University, Sylhet, Bangladesh",
+      "expectedGraduation": "December 2026",
+      "currentFocus": "Machine Learning, Deep Learning, NLP, Computer Vision, LLMs & RAG",
+      "targetPath": "AI/ML Engineering roles & international graduate study (Master's in AI/ML)"
+    },
+    "careerVision": {
+      "nearTerm": "Complete my undergraduate degree (Dec 2026), keep shipping end-to-end AI/ML projects, and apply for AI/ML internships and international graduate programs in Artificial Intelligence and Machine Learning.",
+      "longTerm": "Grow into an AI/ML engineer and applied researcher who builds reliable, well-evaluated intelligent systems that solve real-world problems."
+    },
+    "audiences": {
+      "recruiters": "Hands-on experience taking ML and deep learning models from notebooks to deployed web apps — Flask on Vercel, FastAPI + Docker on Render, Streamlit RAG, and TensorFlow.js in the browser.",
+      "engineers": "Comparative model benchmarking (RF vs DT vs LogReg; RNN vs LSTM vs GRU vs BiGRU), REST APIs, automated test suites, and documented, reproducible repositories.",
+      "researchers": "Curiosity for applied AI research — NLP, computer vision, and LLM grounding — backed by competitive-programming problem solving in C++ and honest reporting of results."
+    },
+    "socials": {
+      "github": "https://github.com/anikdey095",
+      "linkedin": "https://www.linkedin.com/in/anik-dey-7723a4329/",
+      "email": "anikd1452@gmail.com",
+      "resumeUrl": "/resume.pdf"
+    }
+  },
+  "metrics": [
+    {
+      "value": "99.55%",
+      "label": "Crop Recommender Test Accuracy",
+      "detail": "Random Forest (80 trees) on a 20% stratified hold-out of 2,200 samples across 22 crops; 99.59% mean 5-fold stratified CV.",
+      "source": "CropPulse AI — github.com/anikdey095/crop-recommendation",
+      "verified": true
+    },
+    {
+      "value": "~90.1%",
+      "label": "BiGRU Emotion Classification Accuracy",
+      "detail": "Best of four sequence models (SimpleRNN, LSTM, GRU, BiGRU) on the 6-class dair-ai/emotion benchmark.",
+      "source": "Moodline — github.com/anikdey095/Deep_Learning_Project_Sentiment_analysis",
+      "verified": true
+    },
+    {
+      "value": "3",
+      "label": "Live AI/ML Web Apps",
+      "detail": "CropPulse AI (Vercel), Moodline (Render), and FocusBell AI (Vercel) are publicly deployed and accessible.",
+      "source": "Project live deployments",
+      "verified": true
+    },
+    {
+      "value": "Dec 2026",
+      "label": "Undergraduate Graduation",
+      "detail": "B.Sc. in CSE, Metropolitan University, Sylhet, Bangladesh — preparing for AI/ML roles and Master's applications abroad.",
+      "source": "Academic Timeline",
+      "verified": true
+    }
+  ],
+  "projects": [
+    {
+      "id": "crop-recommendation",
+      "slug": "crop-recommendation",
+      "title": "CropPulse AI: Precision Crop Recommendation",
+      "tagline": "Random Forest crop recommender for 22 crops with a Flask API, serverless fallback engine, and an interactive web app deployed on Vercel.",
+      "summary": "An end-to-end machine learning application that recommends the most suitable crop from soil nutrients (N, P, K), temperature, humidity, pH, and rainfall. Three classifiers were benchmarked on 2,200 samples across 22 crop classes; the production Random Forest reaches 99.55% test accuracy and is served through a Flask API on Vercel with a zero-dependency JSON decision-tree fallback, nutrient gap analysis, and fertilizer guidance.",
+      "category": "Machine Learning",
+      "domain": "Precision Agriculture & Applied ML",
+      "status": "Completed",
+      "featured": true,
+      "featuredOrder": 1,
+      "stack": [
+        "Python",
+        "Scikit-learn",
+        "Random Forest",
+        "Pandas",
+        "Flask",
+        "JavaScript",
+        "Vercel"
+      ],
+      "githubUrl": "https://github.com/anikdey095/crop-recommendation",
+      "demoUrl": "https://crop-recommendation-zeta.vercel.app",
+      "metrics": [
+        {
+          "label": "Test Accuracy",
+          "value": "99.55%",
+          "subtext": "Random Forest (80 trees) on a 20% stratified hold-out (440 samples)",
+          "isTrainMetric": false
+        },
+        {
+          "label": "5-Fold Stratified CV",
+          "value": "99.59%",
+          "subtext": "Mean cross-validation accuracy (± 0.3%)"
+        },
+        {
+          "label": "Crop Classes",
+          "value": "22",
+          "subtext": "Cereals, pulses, fruits, and plantation/cash crops"
+        },
+        {
+          "label": "Inference Latency",
+          "value": "0.68 ms",
+          "subtext": "Reported per-prediction latency of the Random Forest"
+        }
+      ],
+      "highlights": [
+        "Benchmarked Random Forest (99.55%), Decision Tree (97.95%), and Logistic Regression (95.00%) on identical stratified splits.",
+        "Dual-engine inference: scikit-learn/joblib model plus a zero-dependency JSON decision-tree evaluator for serverless reliability.",
+        "Interactive UI with agro-ecological presets, Open-Meteo weather autofill, nutrient gap analysis, and fertilizer schedules.",
+        "REST API (/api/predict, /api/crops, /api/model-info, /api/health) covered by a 10-test automated suite."
+      ],
+      "problem": "Smallholder farmers often lack accessible, data-backed tools to pick the right crop for their soil NPK balance and local weather conditions.",
+      "approach": "Benchmarked Logistic Regression, Decision Tree, and Random Forest across 2,200 labeled samples (22 classes); deployed the 99.55%-accurate Random Forest behind a Flask API with Open-Meteo weather autofill and nutrient gap feedback.",
+      "challenges": "Heavy scikit-learn dependencies can trigger cold-start timeouts on serverless deployments, so I implemented a zero-dependency JSON decision-tree fallback engine for reliable inference on Vercel.",
+      "keyArchitecture": "Soil & Climate Inputs (N, P, K, Temp, Humidity, pH, Rainfall) → Flask API on Vercel → Random Forest (joblib) or JSON Tree Fallback → Crop + Confidence + Alternates → Suitability & Fertilizer Advisory UI.",
+      "hasDetailedCaseStudy": true
+    },
+    {
+      "id": "moodline-sentiment",
+      "slug": "moodline-sentiment",
+      "title": "Moodline: Deep Learning Emotion Classification",
+      "tagline": "BiGRU-based NLP system that classifies text into six emotions, served via an async FastAPI backend and deployed on Render.",
+      "summary": "An end-to-end deep learning and NLP application for multi-class emotion classification (joy, sadness, love, anger, fear, surprise). Four sequence architectures — SimpleRNN, LSTM, GRU, and Bidirectional GRU — were trained and compared on the Hugging Face dair-ai/emotion dataset. The best model (BiGRU, ~90.1% test accuracy) is served in real time through a FastAPI backend with an interactive web UI, Docker containerization, and an automated test suite.",
+      "category": "Deep Learning",
+      "domain": "Natural Language Processing",
+      "status": "Completed",
+      "featured": true,
+      "featuredOrder": 2,
+      "stack": [
+        "Python",
+        "TensorFlow",
+        "Keras",
+        "BiGRU / LSTM",
+        "Hugging Face Datasets",
+        "FastAPI",
+        "Docker",
+        "Render"
+      ],
+      "githubUrl": "https://github.com/anikdey095/Deep_Learning_Project_Sentiment_analysis",
+      "demoUrl": "https://moodline-sentiment.onrender.com/",
+      "metrics": [
+        {
+          "label": "BiGRU Test Accuracy",
+          "value": "~90.1%",
+          "subtext": "Selected model on the dair-ai/emotion benchmark",
+          "isTrainMetric": false
+        },
+        {
+          "label": "Architectures Compared",
+          "value": "4",
+          "subtext": "SimpleRNN (~78.4%), LSTM (~86.2%), GRU (~87.8%), BiGRU"
+        },
+        {
+          "label": "Emotion Classes",
+          "value": "6",
+          "subtext": "Joy, Sadness, Love, Anger, Fear, Surprise"
+        },
+        {
+          "label": "Serving",
+          "value": "FastAPI",
+          "subtext": "Async /predict and /health endpoints with Swagger docs"
+        }
+      ],
+      "highlights": [
+        "Compared SimpleRNN, LSTM, GRU, and BiGRU models; selected BiGRU for its bidirectional context.",
+        "Text pipeline: cleaning, contraction normalization, tokenization, and padding to 50 tokens with 300-d embeddings.",
+        "Async FastAPI service returning the predicted emotion, full probability distribution, and latency.",
+        "Dockerfile with a non-root user and health checks, a Render blueprint, and an end-to-end test suite."
+      ],
+      "problem": "Keyword rules struggle to capture nuanced emotional intent in short text across subtle overlapping classes like sadness, fear, and anger.",
+      "approach": "Built a consistent preprocessing pipeline (50-token padding, 300-d embeddings) and trained SimpleRNN, LSTM, GRU, and BiGRU side-by-side on dair-ai/emotion, deploying the best BiGRU (~90.1%) in an async FastAPI + Docker service.",
+      "challenges": "Unidirectional RNNs missed context from trailing negation and modifiers, which bidirectional layers solved—paired with Spatial Dropout to curb overfitting on minority classes like love and surprise.",
+      "keyArchitecture": "Raw Text → Preprocessing & Tokenization (max len 50) → Embedding (300-d) → BiGRU (128) → Spatial Dropout → BiGRU (64) → Dropout → Softmax (6 emotions) → FastAPI /predict → Web UI.",
+      "hasDetailedCaseStudy": true
+    },
+    {
+      "id": "docmind-rag",
+      "slug": "docmind-rag",
+      "title": "DocMind: Multi-PDF RAG Q&A Chatbot",
+      "tagline": "Retrieval-Augmented Generation assistant for chatting with multiple PDFs using LangChain, FAISS, and Llama 3.2 or GPT-3.5.",
+      "summary": "A conversational RAG application that lets users upload one or more PDF documents and ask natural-language questions about them. Text is extracted with PyPDF, split into overlapping chunks, embedded with sentence-transformers (all-MiniLM-L6-v2), and indexed in an in-memory FAISS vector store. A LangChain ConversationalRetrievalChain with conversation memory generates grounded answers using either Hugging Face Llama-3.2-3B-Instruct or OpenAI GPT-3.5-Turbo, all inside a Streamlit interface.",
+      "category": "Generative AI",
+      "domain": "LLMs & Retrieval-Augmented Generation",
+      "status": "Completed",
+      "featured": true,
+      "featuredOrder": 3,
+      "stack": [
+        "Python",
+        "LangChain",
+        "FAISS",
+        "Sentence-Transformers",
+        "Llama 3.2",
+        "OpenAI GPT-3.5",
+        "Streamlit"
+      ],
+      "githubUrl": "https://github.com/anikdey095/Chat-with-Multiple-PDFs",
+      "metrics": [
+        {
+          "label": "Embedding Model",
+          "value": "MiniLM-L6-v2",
+          "subtext": "384-dimensional sentence-transformer embeddings"
+        },
+        {
+          "label": "Vector Store",
+          "value": "FAISS",
+          "subtext": "In-memory similarity search over document chunks"
+        },
+        {
+          "label": "Chunking",
+          "value": "1000 / 200",
+          "subtext": "Characters per chunk / overlap"
+        },
+        {
+          "label": "LLM Backends",
+          "value": "2",
+          "subtext": "Llama-3.2-3B-Instruct (HF) or GPT-3.5-Turbo"
+        }
+      ],
+      "highlights": [
+        "Simultaneous multi-PDF ingestion into a single searchable knowledge base.",
+        "Dual LLM backend selectable from the sidebar: Hugging Face Inference API or OpenAI.",
+        "Conversation memory (ConversationBufferMemory) for coherent follow-up questions.",
+        "Graceful handling of scanned/empty PDFs, missing API keys, and OpenAI quota errors."
+      ],
+      "problem": "Reading and cross-referencing information across multiple dense PDF documents manually is slow, while prompting an LLM directly without context causes hallucinations.",
+      "approach": "Extracted text with PyPDF, split documents into overlapping chunks (1000/200 chars), embedded them using all-MiniLM-L6-v2 into a FAISS vector store, and built a LangChain ConversationalRetrievalChain supporting Llama 3.2 and GPT-3.5.",
+      "challenges": "Tuned chunk boundaries so multi-paragraph context remained intact during similarity lookup, and added explicit error handling for scanned PDFs with no selectable text layer.",
+      "keyArchitecture": "PDF Upload → PyPDF Text Extraction → CharacterTextSplitter (1000/200) → all-MiniLM-L6-v2 Embeddings → FAISS Index → Similarity Retrieval → ConversationalRetrievalChain + Memory → Llama 3.2 / GPT-3.5 → Streamlit Chat UI.",
+      "hasDetailedCaseStudy": true
+    },
+    {
+      "id": "focusbell-ai",
+      "slug": "focusbell-ai",
+      "title": "FocusBell AI: In-Browser Phone Distraction Detector",
+      "tagline": "Study focus timer that uses real-time COCO-SSD object detection in TensorFlow.js to catch phone use and reset the session.",
+      "summary": "A productivity web app that combines a configurable focus timer with real-time computer vision running entirely in the browser. A pre-trained COCO-SSD model (TensorFlow.js) analyzes webcam frames; when a 'cell phone' is detected with confidence above 0.65 during an active session, the app plays an audio alert, shows a warning state, and resets the timer. Webcam frames are processed locally on the device.",
+      "category": "Computer Vision",
+      "domain": "Real-time In-Browser Object Detection",
+      "status": "Completed",
+      "featured": true,
+      "featuredOrder": 4,
+      "stack": [
+        "React",
+        "Vite",
+        "TensorFlow.js",
+        "COCO-SSD",
+        "Tailwind CSS",
+        "Framer Motion",
+        "Vercel"
+      ],
+      "githubUrl": "https://github.com/anikdey095/mobile-detector",
+      "demoUrl": "https://mobile-detector.vercel.app",
+      "metrics": [
+        {
+          "label": "Detection Model",
+          "value": "COCO-SSD",
+          "subtext": "Pre-trained TensorFlow.js object detector"
+        },
+        {
+          "label": "Target Class",
+          "value": "Cell Phone",
+          "subtext": "Triggered when confidence > 0.65"
+        },
+        {
+          "label": "Inference",
+          "value": "In-Browser",
+          "subtext": "Webcam frames processed locally on the device"
+        },
+        {
+          "label": "Alert Cooldown",
+          "value": "4 s",
+          "subtext": "Prevents repeated alerts from a single event"
+        }
+      ],
+      "highlights": [
+        "Continuous frame-by-frame detection with requestAnimationFrame on the webcam stream.",
+        "Phone detection triggers an audio alert, a warning UI state, and a timer reset to enforce focus.",
+        "Configurable hour/minute/second timer (25-minute default) with pause, resume, and abort controls.",
+        "Deployed on Vercel as a lightweight React + Vite single-page app."
+      ],
+      "problem": "Standard study timers don't prevent unconscious smartphone distractions, while cloud-based webcam tools raise serious privacy concerns.",
+      "approach": "Integrated pre-trained COCO-SSD object detection via TensorFlow.js directly inside React so frames never leave the user's browser, alerting and resetting the study timer when a phone is detected (>0.65 confidence).",
+      "challenges": "Continuous detection frames caused UI jank and repeated false-trigger sounds, which I fixed using requestAnimationFrame pacing and a 4-second cooldown gate.",
+      "keyArchitecture": "Webcam MediaStream → HTML5 Video → COCO-SSD (TensorFlow.js) Detection Loop → 'cell phone' score > 0.65 → Cooldown Gate (4 s) → Audio Alert + Timer Reset.",
+      "hasDetailedCaseStudy": true
+    },
+    {
+      "id": "studyhub",
+      "slug": "studyhub",
+      "title": "StudyHub: Academic Collaboration Platform",
+      "tagline": "Full-stack university platform for sharing study materials, course catalogs, careers, and research preprints.",
+      "summary": "A full-stack academic collaboration platform that brings study notes, departmental course catalogs, tuition and internship listings, and research preprints into one place. Built with a Next.js 14 (App Router) + TypeScript frontend and a Node.js/Express REST API using Prisma ORM and PostgreSQL, with JWT authentication, file uploads, and an admin hub for managing departments, courses, careers, and papers.",
+      "category": "Systems & Web",
+      "domain": "Full-Stack Educational Platform",
+      "status": "Completed",
+      "featured": true,
+      "featuredOrder": 5,
+      "stack": [
+        "Next.js",
+        "TypeScript",
+        "React",
+        "Tailwind CSS",
+        "Node.js",
+        "Express",
+        "Prisma",
+        "PostgreSQL"
+      ],
+      "githubUrl": "https://github.com/anikdey095/Studyhub",
+      "metrics": [
+        {
+          "label": "Departments",
+          "value": "6",
+          "subtext": "CSE, SWE, ENG, EEE, ECO, DS pre-configured"
+        },
+        {
+          "label": "Core Modules",
+          "value": "5",
+          "subtext": "Notes, Departments, Careers, Research, Profiles"
+        },
+        {
+          "label": "Auth",
+          "value": "JWT",
+          "subtext": "Sign-up/login with bcrypt hashing and role gateway"
+        }
+      ],
+      "highlights": [
+        "Notes repository with full-text search, filtering, sorting, and multi-format uploads (PDF, DOCX, images).",
+        "Dynamic course creation: students can register new courses that become instantly discoverable.",
+        "Admin hub for departments, courses, job/tuition listings, and research preprints with DOI links.",
+        "Security middleware with Helmet, rate limiting, bcrypt, and Multer-based file handling."
+      ],
+      "problem": "Students across departments often rely on scattered messaging groups for lecture notes, course updates, tuition posts, and research preprints.",
+      "approach": "Designed a full-stack university portal with Next.js 14 App Router, Express REST endpoints, JWT auth, Prisma ORM, and PostgreSQL covering 6 departments and 5 integrated academic modules.",
+      "challenges": "Coordinating structured file uploads, role-gated admin CRUD, and graceful local testing without a live DB required adding Multer validation, rate limiting, and an in-memory fallback store.",
+      "keyArchitecture": "Next.js 14 App Router Client → Axios → Express REST API (/auth, /departments, /notes, /admin, /stats) → Prisma ORM → PostgreSQL (with in-memory fallback store).",
+      "hasDetailedCaseStudy": true
+    },
+    {
+      "id": "bangladesh-driving-assistance",
+      "slug": "bangladesh-driving-assistance",
+      "title": "Intelligent Driving Assistance for Unstructured Roadways",
+      "tagline": "Research direction on computer vision for non-lane traffic, potholes, and pedestrian hazards on Bangladeshi roads.",
+      "summary": "A research direction exploring computer vision perception suited to South Asian road environments, where lane markings are often absent, non-motorized vehicles (rickshaws) are common, pedestrian behavior is unpredictable, and potholes are frequent. This entry documents the problem formulation and a proposed approach; no implementation or empirical results are claimed yet.",
+      "category": "Applied Research",
+      "domain": "Intelligent Transportation & Applied CV",
+      "status": "Research Direction",
+      "featured": false,
+      "stack": [
+        "Python",
+        "PyTorch",
+        "YOLO",
+        "OpenCV",
+        "Edge AI"
+      ],
+      "metrics": [
+        {
+          "label": "Project Stage",
+          "value": "Research Direction",
+          "subtext": "Problem formulation & proposed approach"
+        },
+        {
+          "label": "Perception Targets",
+          "value": "4 Core Classes",
+          "subtext": "Potholes, non-lane vehicles, pedestrians, road boundaries"
+        },
+        {
+          "label": "Target Deployment",
+          "value": "Edge Device",
+          "subtext": "Low-cost dashcam module with visual warnings"
+        }
+      ],
+      "highlights": [
+        "Research gap: popular driving datasets (KITTI, Waymo) assume lane-disciplined traffic that differs from South Asian roads.",
+        "Proposed idea: a lightweight multi-task network for joint object detection and road-hazard segmentation.",
+        "Considers edge hardware constraints for affordable, real-time deployment.",
+        "Clearly separates the conceptual formulation from future empirical validation."
+      ],
+      "problem": "Public ADAS benchmarks assume disciplined lanes and uniform signage, leaving non-lane rickshaw traffic, erratic crossings, and potholes in Bangladesh poorly modeled.",
+      "approach": "Formulated a research agenda around a lightweight multi-task perception network combining object detection and pothole/boundary segmentation suited to monocular dashcams.",
+      "challenges": "Evaluating domain shift, collecting representative local dashcam data without overfitting, and balancing accuracy against affordable edge hardware latency remain open research questions.",
+      "keyArchitecture": "Monocular Dashcam Feed → Shared Lightweight Backbone → Detection Head (vehicles, pedestrians) + Segmentation Head (potholes, drivable area) → Risk Heuristic → Driver Warning.",
+      "hasDetailedCaseStudy": true
+    },
+    {
+      "id": "personal-portfolio",
+      "slug": "personal-portfolio",
+      "title": "My Portfolio: Personal Developer & AI/ML Portfolio",
+      "tagline": "Personal developer and AI/ML portfolio built with Next.js, React, TypeScript, Tailwind CSS, Three.js, and an interactive AI playground.",
+      "summary": "A personal portfolio website showcasing my AI/ML and software engineering projects, verified model benchmarks, interactive AI simulators (embeddings, RAG pipeline, and vision bounding boxes), learning timeline, and research interests—complete with dark/light mode and a dynamic Admin Studio.",
+      "category": "Systems & Web",
+      "domain": "Personal Portfolio & Web Engineering",
+      "status": "Completed",
+      "featured": true,
+      "featuredOrder": 6,
+      "stack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Three.js",
+        "Framer Motion"
+      ],
+      "githubUrl": "https://github.com/anikdey095/portfolio-main",
+      "metrics": [
+        {
+          "label": "Interactive Simulators",
+          "value": "3",
+          "subtext": "Embedding space, RAG chunking, and vision confidence"
+        },
+        {
+          "label": "Theme & UI",
+          "value": "Dark / Light",
+          "subtext": "Responsive navy palette with subtle WebGL constellation"
+        },
+        {
+          "label": "Content Studio",
+          "value": "Dynamic",
+          "subtext": "Built-in /admin dashboard & REST API routes"
+        }
+      ],
+      "highlights": [
+        "Human-centered dark navy design with circular portrait framing, subtle 3D WebGL constellation background, and light/dark theme toggle.",
+        "Interactive AI Playground featuring client-side Embedding Space, RAG Chunking Pipeline, and Vision Bounding-Box simulators.",
+        "Detailed engineering write-ups for every project covering problem statement, approach, architecture, and lessons learned.",
+        "Built-in Dynamic Admin Studio (/admin) and REST API endpoints (/api/admin, /api/contact, /api/data) for managing content and messages."
+      ],
+      "problem": "Generic template portfolios often feel either overly flashy or too static to communicate real AI/ML engineering depth, experiments, and code trade-offs.",
+      "approach": "Designed and built a custom Next.js + TypeScript portfolio combining personal storytelling, structured project write-ups, interactive AI concept simulators, and a local JSON-backed admin studio.",
+      "challenges": "Balancing 3D WebGL visuals and interactive simulators with fast page loads and clean readability required lazy-loading Three.js scenes and keeping the visual hierarchy calm.",
+      "keyArchitecture": "Next.js App Router (React 19 + TypeScript) → Tailwind CSS v4 + Three.js Hero → Structured Data & JSON Store (content.json) → /api/admin & /api/contact Route Handlers.",
+      "hasDetailedCaseStudy": true
+    }
+  ],
+  "research": [
+    {
+      "id": "bangladesh-unstructured-roads",
+      "title": "AI-Based Intelligent Driving Assistance System for Bangladesh’s Unstructured & Uneven Roads",
+      "tagline": "Perception architectures suited to non-lane traffic, pavement hazards, and mixed vehicles in South Asian driving environments.",
+      "status": "Exploring",
+      "domain": "Computer Vision & Intelligent Transportation Systems",
+      "targetOutcome": "Undergraduate Thesis & Prospective Graduate Research Proposal",
+      "problem": "Standard autonomous vehicle perception datasets (e.g. KITTI, Waymo, nuScenes) presume clearly delineated road lanes, uniform vehicle geometry, and orderly pedestrian crossings. In Bangladesh, roads are largely non-lane-based, dominated by heterogeneous non-motorized and three-wheeled vehicles (rickshaws, CNG auto-rickshaws), unpredictable pedestrian crossings, and severe surface degradation (potholes, unpaved shoulders).",
+      "researchQuestion": "How can a lightweight monocular computer vision architecture jointly perceive unstructured multi-class obstacles and segment road-surface hazards under challenging visual conditions (monsoon rain glare, dust, low-light illumination) on edge compute budgets?",
+      "whyItMatters": "Road traffic injuries are a major public-safety challenge in South Asia. Affordable, aftermarket dashcam-based assistance systems could provide proactive collision and pothole warnings without expensive sensor suites.",
+      "existingApproaches": "Commercial systems rely heavily on lane-departure warning heuristics and LiDAR point clouds. Existing road anomaly studies typically isolate pothole detection on static frames or depend on sensor rigs tailored to structured Western roadways.",
+      "researchGap": "Scarcity of open-access Bangladeshi multi-hazard driving datasets, limited joint perception models that operate without lane priors, and strong domain shifts across local vehicle classes and weather.",
+      "proposedDirection": "A dual-task lightweight convolutional architecture sharing a visual backbone: one head for localized object detection and tracking (rickshaws, auto-rickshaws, buses, pedestrians) and a second head for drivable-area and pothole segmentation, paired with monocular proximity heuristics.",
+      "experiments": "Currently in conceptual formulation and literature review stage; planned empirical work will benchmark detection mAP, segmentation IoU, and edge inference latency once a localized dashcam video benchmark is collected and annotated.",
+      "currentResults": "Formalized the problem definition, target perception taxonomy, and architectural outline. No custom dataset collection, model training, or empirical field experiments have been conducted yet.",
+      "limitations": "Strictly a research direction and proposal outline at this stage; requires curated, annotated field video across varied Bangladeshi traffic and weather conditions before empirical validation.",
+      "futureWork": "Develop as an undergraduate thesis and prospective Master's research topic: curate and annotate local road footage, benchmark YOLO-family detectors on local vehicle classes, and test quantized edge deployment.",
+      "tags": [
+        "Computer Vision",
+        "Unstructured Roads",
+        "Edge AI",
+        "Object Detection",
+        "ADAS",
+        "Applied Research"
+      ],
+      "statusNote": "Research Direction & Proposal Formulation (No empirical results claimed yet)"
+    },
+    {
+      "id": "affective-nlp-sequence-modeling",
+      "title": "Comparative Sequence Modeling for Multi-Class Emotion Recognition in Text",
+      "tagline": "Evaluating recurrent gating and bidirectional context across SimpleRNN, LSTM, GRU, and BiGRU on six-class affective text.",
+      "status": "Experimenting",
+      "domain": "Deep Learning & Natural Language Processing",
+      "targetOutcome": "Deployed Inference System (Moodline) & Future Transformer / Low-Resource Extension",
+      "problem": "Coarse binary sentiment analysis (positive vs negative) obscures distinct emotional states such as sadness, fear, and anger that carry very different meanings in user feedback, mental-health triage, and conversational agents.",
+      "researchQuestion": "How strongly do gated recurrent units and bidirectional context improve six-class emotion discrimination on short text sequences, and where do fixed-vocabulary recurrent models break down compared to contextual transformers?",
+      "whyItMatters": "Understanding the accuracy-latency-parameter trade-offs between lightweight recurrent models and larger pretrained transformers helps engineers deploy responsive NLP systems on constrained cloud or edge hardware.",
+      "existingApproaches": "Bag-of-words linear baselines miss word order and negation, while large transformer encoders add higher memory and inference latency footprints in CPU-only containers.",
+      "researchGap": "Comparing recurrent variants under identical preprocessing and deployment constraints while extending affective NLP evaluations to code-mixed and Bangla text.",
+      "proposedDirection": "Benchmarked four recurrent architectures (SimpleRNN, LSTM, GRU, BiGRU) with 300-dimensional embeddings and SpatialDropout(0.5) on the Hugging Face dair-ai/emotion dataset, deploying the best model behind a FastAPI + Docker service.",
+      "experiments": "Trained all four sequence models under a 50-token padded pipeline (~15,000-word vocabulary) in sentiment_analysis.ipynb and verified end-to-end API behavior through an automated 5-test suite in Moodline.",
+      "currentResults": "Observed progressive gains from SimpleRNN (~78.4%, ~1.3M params) to LSTM (~86.2%, ~1.6M params), GRU (~87.8%, ~1.5M params), and BiGRU (~90.1%, ~2.1M params), with BiGRU served live at moodline-sentiment.onrender.com.",
+      "limitations": "Evaluations currently report aggregate test accuracy on a single English benchmark with a 50-token window; per-class confusion breakdowns and cross-domain or Bangla generalization have not yet been benchmarked.",
+      "futureWork": "Compare BiGRU directly against fine-tuned compact transformers (e.g. DistilBERT), add per-class F1 and calibration metrics, and extend experiments to Bangla emotion datasets.",
+      "tags": [
+        "NLP",
+        "Deep Learning",
+        "BiGRU",
+        "Sequence Modeling",
+        "FastAPI",
+        "Affective Computing"
+      ],
+      "statusNote": "Implemented & Deployed in Moodline; Transformer Comparison Planned"
+    },
+    {
+      "id": "grounded-rag-architectures",
+      "title": "Grounded Multi-Document Retrieval-Augmented Generation & Hybrid Reranking",
+      "tagline": "Exploring chunking sensitivity, hybrid lexical-dense search, and cross-encoder reranking beyond single-stage FAISS baselines.",
+      "status": "Exploring",
+      "domain": "Generative AI & Information Retrieval",
+      "targetOutcome": "Working Multi-PDF RAG Baseline (DocMind) & Two-Stage Retrieval Study",
+      "problem": "Single-stage dense vector retrieval can return top-k chunks that are topically adjacent yet miss exact technical terms or split key facts across chunk boundaries, degrading LLM answer faithfulness.",
+      "researchQuestion": "How do chunking boundaries, hybrid sparse-dense retrieval (BM25 + dense embeddings), and cross-encoder reranking affect retrieval precision and answer grounding compared to a single-stage FAISS baseline?",
+      "whyItMatters": "Students, researchers, and engineers querying dense multi-PDF technical or academic corpora need verifiable, source-grounded answers rather than plausible-sounding hallucinations.",
+      "existingApproaches": "Standard LangChain/FAISS pipelines split text into fixed-size character chunks (e.g. 1,000 characters with 200 overlap) and retrieve via cosine similarity alone without reranking or citation verification.",
+      "researchGap": "Evaluating exact-term recall and multi-document attribution across lightweight local embedding models (all-MiniLM-L6-v2) paired with small open-weights LLMs (Llama-3.2-3B-Instruct).",
+      "proposedDirection": "Built the baseline pipeline in DocMind (PyPDF + CharacterTextSplitter 1000/200 + all-MiniLM-L6-v2 + FAISS + ConversationalRetrievalChain with Llama 3.2 / GPT-3.5) and actively exploring two-stage hybrid retrieval (BM25 + dense Reciprocal Rank Fusion) with cross-encoder reranking and page-level source citations.",
+      "experiments": "Implemented and manually tested multi-PDF ingestion, conversation buffer memory, and dual Hugging Face / OpenAI LLM switching in DocMind; quantitative RAG evaluation (faithfulness and context recall benchmarks) is planned next.",
+      "currentResults": "Working Streamlit application supporting multi-PDF upload, 384D local MiniLM embeddings, FAISS search, and graceful error handling for scanned PDFs and API limits.",
+      "limitations": "Current implementation uses single-stage dense similarity search without reranking, stores the FAISS index in memory per session, and has not yet been evaluated on a labeled RAG benchmark.",
+      "futureWork": "Add page-level source citations, implement BM25 + dense hybrid retrieval with a cross-encoder reranker, support OCR for scanned PDFs, and benchmark retrieval metrics systematically.",
+      "tags": [
+        "RAG",
+        "LLMs",
+        "FAISS",
+        "LangChain",
+        "Embeddings",
+        "Information Retrieval"
+      ],
+      "statusNote": "Baseline Implemented in DocMind; Reranking & Evaluation Under Exploration"
+    }
+  ],
+  "skills": [
+    {
+      "id": "programming",
+      "title": "Programming Foundations",
+      "description": "Core languages utilized for AI/ML development, competitive programming, and full-stack software engineering.",
+      "items": [
+        {
+          "name": "Python",
+          "status": "Building with",
+          "focusArea": "Primary AI/ML & Backend Language",
+          "context": "Scikit-learn, TensorFlow/Keras, PyTorch, LangChain, FastAPI, Flask, Streamlit, Pandas, NumPy"
+        },
+        {
+          "name": "C++",
+          "status": "Building with",
+          "focusArea": "Competitive Programming & DSA",
+          "context": "STL, sorting/searching, dynamic programming, graph algorithms across Codeforces, LeetCode, CodeChef"
+        },
+        {
+          "name": "C",
+          "status": "Working with",
+          "focusArea": "Foundational Programming",
+          "context": "Pointers, memory fundamentals, core algorithmic logic and structured programming"
+        },
+        {
+          "name": "TypeScript & JavaScript",
+          "status": "Building with",
+          "focusArea": "Full-Stack & In-Browser AI Apps",
+          "context": "Next.js, React, TensorFlow.js, Node.js, Express REST APIs, interactive web frontends"
+        },
+        {
+          "name": "Java",
+          "status": "Working with",
+          "focusArea": "Object-Oriented Systems",
+          "context": "Java Swing/JFrame desktop UIs, JDBC/MySQL integration (University Management System)"
+        },
+        {
+          "name": "SQL",
+          "status": "Building with",
+          "focusArea": "Relational Data Modeling",
+          "context": "PostgreSQL with Prisma ORM (StudyHub), MySQL schema design and queries"
+        }
+      ]
+    },
+    {
+      "id": "machine-learning",
+      "title": "Applied Machine Learning",
+      "description": "Supervised classification, feature analysis, comparative benchmarking, and production serving.",
+      "items": [
+        {
+          "name": "Scikit-learn",
+          "status": "Building with",
+          "focusArea": "Model Pipelines & Ensembles",
+          "context": "Random Forest, Decision Tree, Logistic Regression, StandardScaler, joblib serialization in CropPulse AI"
+        },
+        {
+          "name": "Pandas & NumPy",
+          "status": "Building with",
+          "focusArea": "Tabular Data Manipulation",
+          "context": "Dataset cleaning, summary statistics, feature transformation, numerical preprocessing"
+        },
+        {
+          "name": "Classification & Ensemble Modeling",
+          "status": "Building with",
+          "focusArea": "Multi-Class Supervised Learning",
+          "context": "22-class crop prediction with probability ranking, confidence scores, and fallback JSON tree inference"
+        },
+        {
+          "name": "Model Evaluation & Validation",
+          "status": "Focused on",
+          "focusArea": "Rigorous Benchmarking",
+          "context": "Stratified K-Fold CV, train/test splits, macro Precision/Recall/F1, confusion matrices"
+        },
+        {
+          "name": "Feature Importance & Analysis",
+          "status": "Building with",
+          "focusArea": "Domain Feature Insights",
+          "context": "Tree feature importances and agronomic nutrient gap analysis for interpretable advisories"
+        }
+      ]
+    },
+    {
+      "id": "deep-learning",
+      "title": "Deep Learning & NLP",
+      "description": "Neural network architectures, sequence modeling for NLP, regularization, and inference optimization.",
+      "items": [
+        {
+          "name": "TensorFlow & Keras",
+          "status": "Building with",
+          "focusArea": "Sequence Modeling & Deployment",
+          "context": "Training and serving SimpleRNN, LSTM, GRU, and BiGRU emotion classifiers in Moodline"
+        },
+        {
+          "name": "PyTorch",
+          "status": "Working with",
+          "focusArea": "Deep Learning Framework",
+          "context": "Tensors, autograd, neural network modules, and applied computer vision / DL experimentation"
+        },
+        {
+          "name": "RNN / LSTM / GRU / BiGRU",
+          "status": "Building with",
+          "focusArea": "Recurrent Sequence Modeling",
+          "context": "6-class emotion classification on dair-ai/emotion with 300D embeddings and SpatialDropout"
+        },
+        {
+          "name": "CNNs",
+          "status": "Working with",
+          "focusArea": "Visual Feature Extraction",
+          "context": "Convolutional layers, pooling, batch normalization, and spatial pattern learning"
+        },
+        {
+          "name": "Transformers & Attention",
+          "status": "Exploring",
+          "focusArea": "Modern Neural Architectures",
+          "context": "Self-attention mechanisms, encoder/decoder LLMs, and fine-tuning workflows"
+        }
+      ]
+    },
+    {
+      "id": "computer-vision",
+      "title": "Computer Vision",
+      "description": "Real-time in-browser object detection, webcam pipelines, and applied perception research.",
+      "items": [
+        {
+          "name": "TensorFlow.js & COCO-SSD",
+          "status": "Building with",
+          "focusArea": "Client-Side Object Detection",
+          "context": "Real-time webcam phone distraction detection (> 0.65 confidence) in FocusBell AI"
+        },
+        {
+          "name": "OpenCV",
+          "status": "Working with",
+          "focusArea": "Image & Video Processing",
+          "context": "Frame manipulation, color space transforms, filtering, and computer vision preprocessing"
+        },
+        {
+          "name": "Object Detection",
+          "status": "Focused on",
+          "focusArea": "Real-Time Visual Perception",
+          "context": "Bounding-box confidence thresholding, NMS concepts, and webcam stream lifecycle management"
+        },
+        {
+          "name": "YOLO Architectures",
+          "status": "Exploring",
+          "focusArea": "Edge Detection Research",
+          "context": "Studied single-stage detection for Bangladesh unstructured-road perception research direction"
+        }
+      ]
+    },
+    {
+      "id": "generative-ai",
+      "title": "LLMs, RAG & Agentic AI",
+      "description": "Document retrieval pipelines, semantic vector embeddings, open-weights/API LLMs, and agent workflows.",
+      "items": [
+        {
+          "name": "RAG (Retrieval-Augmented Generation)",
+          "status": "Building with",
+          "focusArea": "Grounded Multi-PDF Q&A",
+          "context": "DocMind multi-PDF chatbot built with PyPDF extraction, chunking, vector retrieval, and chat memory"
+        },
+        {
+          "name": "LangChain",
+          "status": "Building with",
+          "focusArea": "LLM & Retrieval Orchestration",
+          "context": "CharacterTextSplitter (1000/200), ConversationalRetrievalChain, ConversationBufferMemory"
+        },
+        {
+          "name": "FAISS & Vector Search",
+          "status": "Building with",
+          "focusArea": "Dense Semantic Similarity",
+          "context": "In-memory FAISS indexing with 384D all-MiniLM-L6-v2 sentence-transformer embeddings"
+        },
+        {
+          "name": "LLMs (Llama 3.2 & GPT-3.5)",
+          "status": "Building with",
+          "focusArea": "Multi-Provider Inference",
+          "context": "meta-llama/Llama-3.2-3B-Instruct via Hugging Face Inference API and OpenAI gpt-3.5-turbo"
+        },
+        {
+          "name": "Agentic AI & Reranking",
+          "status": "Exploring",
+          "focusArea": "Hybrid Retrieval & Tool Use",
+          "context": "Hybrid BM25 + dense fusion, cross-encoder rerankers, and ReAct tool-calling verification loops"
+        }
+      ]
+    },
+    {
+      "id": "engineering",
+      "title": "Software, APIs & Deployment",
+      "description": "Backend APIs, full-stack web applications, databases, containerization, and cloud deployment.",
+      "items": [
+        {
+          "name": "FastAPI & Flask",
+          "status": "Building with",
+          "focusArea": "ML Model Serving APIs",
+          "context": "Moodline async FastAPI backend (Swagger/ReDoc) and CropPulse AI serverless Flask API"
+        },
+        {
+          "name": "Next.js, React & Tailwind CSS",
+          "status": "Building with",
+          "focusArea": "Modern Web Applications",
+          "context": "StudyHub (Next.js 14 App Router + TypeScript), FocusBell AI (React + Vite), and portfolio"
+        },
+        {
+          "name": "Node.js, Express & Prisma ORM",
+          "status": "Building with",
+          "focusArea": "Full-Stack REST Backends",
+          "context": "StudyHub modular backend with JWT auth, bcrypt, Helmet, rate limiting, and Multer uploads"
+        },
+        {
+          "name": "PostgreSQL, MySQL & MongoDB",
+          "status": "Building with",
+          "focusArea": "Database Engineering",
+          "context": "StudyHub (PostgreSQL + Prisma), University-management & blood-donation-system (MySQL), MongoDB"
+        },
+        {
+          "name": "Docker & Cloud Deployment",
+          "status": "Building with",
+          "focusArea": "Reproducible Environments & Hosting",
+          "context": "Dockerfiles with health checks, Render blueprints, Vercel serverless deployments, Streamlit"
+        },
+        {
+          "name": "Git & GitHub",
+          "status": "Building with",
+          "focusArea": "Version Control & Documentation",
+          "context": "Clean repository structure, automated test scripts (test_app.py), technical READMEs"
+        }
+      ]
+    }
+  ],
+  "journey": [
+    {
+      "step": "01",
+      "title": "Programming & Algorithmic Foundations",
+      "domain": "C, C++, Java, PHP, Data Structures, Algorithms",
+      "period": "Foundational Phase",
+      "description": "Built computational problem-solving foundations through competitive programming and university systems projects. Practiced algorithmic problem solving across Codeforces, LeetCode, CodeChef, and ACM contests, and built database-backed software systems in Java and PHP/MySQL.",
+      "focusPoints": [
+        "Practiced sorting, searching, recursion, dynamic programming, and graph algorithms in C and C++ across Codeforces, LeetCode, CodeChef, and ACM contest repositories.",
+        "Developed University-management with Java Swing/JFrame and MySQL featuring separate admin, faculty, and student dashboards.",
+        "Built and deployed blood-donation-system-master with PHP and MySQL for donor, patient, and donation record tracking."
+      ],
+      "keyOutcome": "Strong algorithmic thinking and core software engineering discipline."
+    },
+    {
+      "step": "02",
+      "title": "Applied Machine Learning & Statistical Modeling",
+      "domain": "Python, Scikit-learn, Pandas, Flask, Vercel",
+      "period": "Core ML Phase",
+      "description": "Transitioned into tabular machine learning and end-to-end model deployment. Designed CropPulse AI to recommend optimal crops across 22 agricultural classes from soil macronutrients and micro-climatic inputs.",
+      "focusPoints": [
+        "Evaluated Random Forest (99.55% test / 99.59% 5-fold stratified CV), Decision Tree (97.95%), and Logistic Regression (95.00%) on 2,200 samples.",
+        "Analyzed feature importance across rainfall (23.39%), humidity (22.55%), K (17.49%), P (15.04%), N (9.50%), temperature (7.27%), and pH (4.76%).",
+        "Shipped a dual-engine Flask API on Vercel combining scikit-learn/joblib with a 0.68 ms zero-dependency JSON decision-tree fallback and Open-Meteo autofill."
+      ],
+      "keyOutcome": "Practical mastery of comparative benchmarking and serverless ML serving."
+    },
+    {
+      "step": "03",
+      "title": "Deep Learning & NLP Sequence Modeling",
+      "domain": "TensorFlow, Keras, PyTorch, BiGRU / LSTM, FastAPI, Docker",
+      "period": "Deep Learning Phase",
+      "description": "Moved into deep neural sequence modeling and containerized NLP inference. Built Moodline on the Hugging Face dair-ai/emotion dataset to classify text into six emotions: joy, sadness, love, anger, fear, and surprise.",
+      "focusPoints": [
+        "Trained and benchmarked SimpleRNN (~78.4%), LSTM (~86.2%), GRU (~87.8%), and Bidirectional GRU (~90.1%) with 300D embeddings and SpatialDropout.",
+        "Built an async FastAPI service with /predict and /health endpoints, Swagger/ReDoc documentation, and resilient Keras 3 deserialization.",
+        "Containerized the pipeline with Docker (non-root user, health checks), wrote a 5-test automated suite, and deployed live on Render."
+      ],
+      "keyOutcome": "Hands-on experience taking recurrent deep learning models from notebooks to Dockerized APIs."
+    },
+    {
+      "step": "04",
+      "title": "Computer Vision & In-Browser Inference",
+      "domain": "TensorFlow.js, COCO-SSD, OpenCV, React, Vite",
+      "period": "Computer Vision Phase",
+      "description": "Explored real-time visual perception directly inside the web browser without transmitting webcam video to external servers. Built FocusBell AI to pair a configurable focus timer with automated smartphone distraction detection.",
+      "focusPoints": [
+        "Integrated pre-trained COCO-SSD via @tensorflow-models/coco-ssd and @tensorflow/tfjs on a 640×480 webcam MediaStream.",
+        "Implemented continuous requestAnimationFrame inference filtering for 'cell phone' detections above 0.65 confidence.",
+        "Added a 4-second alert cooldown, audio alert feedback, and automatic session reset, deployed on Vercel."
+      ],
+      "keyOutcome": "Ability to run privacy-preserving client-side computer vision in interactive web applications."
+    },
+    {
+      "step": "05",
+      "title": "Large Language Models & Semantic Embeddings",
+      "domain": "Llama 3.2, OpenAI GPT-3.5, Hugging Face, Sentence-Transformers",
+      "period": "Generative AI Phase",
+      "description": "Investigated open-weights and API-hosted LLMs alongside dense semantic representations. Worked with sentence-transformer embeddings, temperature and token calibration, and multi-provider LLM orchestration.",
+      "focusPoints": [
+        "Generated 384-dimensional dense vector representations using all-MiniLM-L6-v2 for semantic document retrieval.",
+        "Integrated dual inference providers: meta-llama/Llama-3.2-3B-Instruct via Hugging Face Inference API and OpenAI gpt-3.5-turbo.",
+        "Handled edge cases gracefully, including missing API credentials, quota exhaustion fallbacks, and unextractable scanned PDFs."
+      ],
+      "keyOutcome": "Practical command over embedding pipelines and multi-backend LLM integration."
+    },
+    {
+      "step": "06",
+      "title": "RAG & Agentic Systems Exploration",
+      "domain": "LangChain, FAISS, Streamlit, Two-Stage Retrieval, Agentic AI",
+      "period": "Active Building Phase",
+      "description": "Built DocMind for conversational Q&A over multiple uploaded PDFs using LangChain and FAISS, while actively studying advanced RAG techniques — hybrid sparse-dense retrieval, cross-encoder reranking, and agentic tool-use workflows.",
+      "focusPoints": [
+        "Implemented multi-PDF ingestion with PyPDF, CharacterTextSplitter (1000 chars, 200 overlap), FAISS indexing, and ConversationBufferMemory.",
+        "Studying Reciprocal Rank Fusion (BM25 + dense embeddings) and cross-encoder reranking to reduce noisy context chunks.",
+        "Exploring structured agentic patterns including ReAct tool calling and verification loops."
+      ],
+      "keyOutcome": "Building grounded document-intelligence systems and studying reliable retrieval architectures."
+    },
+    {
+      "step": "07",
+      "title": "Full-Stack Systems & Applied AI Research Direction",
+      "domain": "Next.js, TypeScript, Express, Prisma, PostgreSQL, Applied CV Research",
+      "period": "Current Focus & Graduate Trajectory",
+      "description": "Combined full-stack engineering in StudyHub (Next.js 14 + Express + Prisma + PostgreSQL) with an active undergraduate research direction on computer vision for Bangladesh's unstructured roadways, preparing for December 2026 graduation, AI/ML engineering roles, and international Master's programs.",
+      "focusPoints": [
+        "Built StudyHub with Next.js 14 App Router, Express REST APIs, Prisma ORM, PostgreSQL, JWT auth, and a dynamic course/notes/research portal.",
+        "Formulating an applied computer vision research agenda addressing non-lane South Asian traffic, local vehicle classes, and road hazards.",
+        "Preparing academic and technical portfolio for AI/ML internships, engineering positions, and graduate applications abroad."
+      ],
+      "keyOutcome": "Bridging full-stack AI engineering with focused preparation for applied research."
+    }
+  ],
+  "messages": []
+}

@@ -1,31 +1,30 @@
 export const profile = {
-  name: "Anik Dey",
-  avatar: "/profile.jpg", // Place your photo at public/profile.jpg
-  title: "Aspiring AI / ML Engineer",
-  subtitle:
-    "Building practical AI applications across machine learning, deep learning, NLP, computer vision, and retrieval-augmented generation (RAG).",
-  bio: "Computer Science and Engineering undergraduate at Metropolitan University, Sylhet, Bangladesh, and competitive programmer. I build and deploy end-to-end AI applications — from a Random Forest crop recommender and a BiGRU emotion classifier to a multi-PDF RAG chatbot and in-browser object detection — while strengthening my foundations in data structures, algorithms, and neural networks.",
-  location: "Sylhet, Bangladesh",
-  education: {
-    degree: "B.Sc. in Computer Science and Engineering",
-    institution: "Metropolitan University, Sylhet, Bangladesh",
-    expectedGraduation: "December 2026",
-    currentFocus: "Machine Learning, Deep Learning, NLP, Computer Vision, LLMs & RAG",
-    targetPath: "AI/ML Engineering roles & international graduate study (Master's in AI/ML)",
+  "name": "Anik Dey",
+  "avatar": "/profile.png",
+  "title": "Aspiring AI / ML Engineer",
+  "subtitle": "Building practical AI applications across machine learning, deep learning, NLP, computer vision, and retrieval-augmented generation (RAG).",
+  "bio": "Computer Science and Engineering undergraduate at Metropolitan University, Sylhet, Bangladesh, and competitive programmer. I build and deploy end-to-end AI applications — from a Random Forest crop recommender and a BiGRU emotion classifier to a multi-PDF RAG chatbot and in-browser object detection — while strengthening my foundations in data structures, algorithms, and neural networks.",
+  "location": "Sylhet, Bangladesh",
+  "education": {
+    "degree": "B.Sc. in Computer Science and Engineering",
+    "institution": "Metropolitan University, Sylhet, Bangladesh",
+    "expectedGraduation": "December 2026",
+    "currentFocus": "Machine Learning, Deep Learning, NLP, Computer Vision, LLMs & RAG",
+    "targetPath": "AI/ML Engineering roles & international graduate study (Master's in AI/ML)"
   },
-  careerVision: {
-    nearTerm: "Complete my undergraduate degree (Dec 2026), keep shipping end-to-end AI/ML projects, and apply for AI/ML internships and international graduate programs in Artificial Intelligence and Machine Learning.",
-    longTerm: "Grow into an AI/ML engineer and applied researcher who builds reliable, well-evaluated intelligent systems that solve real-world problems.",
+  "careerVision": {
+    "nearTerm": "Complete my undergraduate degree (Dec 2026), keep shipping end-to-end AI/ML projects, and apply for AI/ML internships and international graduate programs in Artificial Intelligence and Machine Learning.",
+    "longTerm": "Grow into an AI/ML engineer and applied researcher who builds reliable, well-evaluated intelligent systems that solve real-world problems."
   },
-  audiences: {
-    recruiters: "Hands-on experience taking ML and deep learning models from notebooks to deployed web apps — Flask on Vercel, FastAPI + Docker on Render, Streamlit RAG, and TensorFlow.js in the browser.",
-    engineers: "Comparative model benchmarking (RF vs DT vs LogReg; RNN vs LSTM vs GRU vs BiGRU), REST APIs, automated test suites, and documented, reproducible repositories.",
-    researchers: "Curiosity for applied AI research — NLP, computer vision, and LLM grounding — backed by competitive-programming problem solving in C++ and honest reporting of results.",
+  "audiences": {
+    "recruiters": "Hands-on experience taking ML and deep learning models from notebooks to deployed web apps — Flask on Vercel, FastAPI + Docker on Render, Streamlit RAG, and TensorFlow.js in the browser.",
+    "engineers": "Comparative model benchmarking (RF vs DT vs LogReg; RNN vs LSTM vs GRU vs BiGRU), REST APIs, automated test suites, and documented, reproducible repositories.",
+    "researchers": "Curiosity for applied AI research — NLP, computer vision, and LLM grounding — backed by competitive-programming problem solving in C++ and honest reporting of results."
   },
-  socials: {
-    github: "https://github.com/anikdey095",
-    linkedin: "https://www.linkedin.com/in/anik-dey-7723a4329/",
-    email: "anikd1452@gmail.com",
-    resumeUrl: "/resume.pdf",
-  },
+  "socials": {
+    "github": "https://github.com/anikdey095",
+    "linkedin": "https://www.linkedin.com/in/anik-dey-7723a4329/",
+    "email": "anikd1452@gmail.com",
+    "resumeUrl": "/resume.pdf"
+  }
 };

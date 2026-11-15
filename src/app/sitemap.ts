@@ -1,8 +1,11 @@
 import { MetadataRoute } from "next";
-import { projects } from "@/data/projects";
+import { getPortfolioData } from "@/lib/portfolioDb";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://anikdey.dev";
+  const { projects } = await getPortfolioData();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

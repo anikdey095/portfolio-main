@@ -1,11 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { skillCategories } from "@/data/skills";
+import { skillCategories as defaultSkills } from "@/data/skills";
+import type { SkillCategory } from "@/types/portfolio";
 import { Cpu, Terminal, Check, Info } from "lucide-react";
 
-export function TechStackSection() {
-  const [activeCategoryId, setActiveCategoryId] = useState<string>("deep-learning");
+export function TechStackSection({
+  skillCategories = defaultSkills,
+}: {
+  skillCategories?: SkillCategory[];
+}) {
+  const [activeCategoryId, setActiveCategoryId] = useState<string>(
+    skillCategories.find((c) => c.id === "deep-learning")?.id ||
+      skillCategories[0]?.id ||
+      ""
+  );
 
   const activeCategory =
     skillCategories.find((c) => c.id === activeCategoryId) || skillCategories[0];

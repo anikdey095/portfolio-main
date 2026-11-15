@@ -2,25 +2,22 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { caseStudies } from "@/data/caseStudies";
-import { projects } from "@/data/projects";
+import { getPortfolioData, getProjectWithCaseStudyBySlug } from "@/lib/portfolioDb";
 import { ArrowLeft, ExternalLink, AlertTriangle, Info, CheckCircle2, BookOpen, Terminal, Layers } from "lucide-react";
 import { Github } from "@/components/ui/BrandIcons";
+
+export const dynamic = "force-dynamic";
 
 interface CaseStudyPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  return projects.map((p) => ({
-    slug: p.slug,
-  }));
-}
-
 export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
   const { slug } = await params;
-  const study = caseStudies[slug];
-  const project = projects.find((p) => p.slug === slug);
+  const [{ project, study }, portfolio] = await Promise.all([
+    getProjectWithCaseStudyBySlug(slug),
+    getPortfolioData(),
+  ]);
 
   if (!study || !project) {
     notFound();
@@ -47,7 +44,7 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col">
-      <Navbar />
+      <Navbar profile={portfolio.profile} />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 w-full">
         {/* Breadcrumbs */}
@@ -101,6 +98,34 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
               {study.subtitle}
             </p>
           </div>
+
+          {project.imageUrl && (
+            <div className="rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-secondary)] max-h-[420px]">
+              <img
+                src={project.imageUrl}
+                alt={`${project.title} cover`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+
+          {project.galleryImages && project.galleryImages.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              {project.galleryImages.map((imgUrl, idx) => (
+                <div
+                  key={`${imgUrl}-${idx}`}
+                  className="rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-secondary)] aspect-[16/10]"
+                >
+                  <img
+                    src={imgUrl}
+                    alt={`${project.title} gallery ${idx + 1}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Action Links (17 GitHub & 18 Demo) */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -274,7 +299,7 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
         </div>
       </main>
 
-      <Footer />
+      <Footer profile={portfolio.profile} />
     </div>
   );
 }

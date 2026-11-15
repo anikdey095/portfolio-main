@@ -1,13 +1,18 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ResearchSection } from "@/components/sections/ResearchSection";
+import { getPortfolioData } from "@/lib/portfolioDb";
 import { FlaskConical, ArrowLeft, GraduationCap, Compass, BookOpen } from "lucide-react";
 import Link from "next/link";
 
-export default function ResearchPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ResearchPage() {
+  const data = await getPortfolioData();
+
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col">
-      <Navbar />
+      <Navbar profile={data.profile} />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 w-full">
         {/* Breadcrumb */}
@@ -61,10 +66,10 @@ export default function ResearchPage() {
         </div>
 
         {/* Research Cards Section */}
-        <ResearchSection />
+        <ResearchSection researchCards={data.research} />
       </main>
 
-      <Footer />
+      <Footer profile={data.profile} />
     </div>
   );
 }

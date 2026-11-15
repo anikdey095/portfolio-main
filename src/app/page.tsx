@@ -10,33 +10,38 @@ import { JourneySection } from "@/components/sections/JourneySection";
 import { ExploringSection } from "@/components/sections/ExploringSection";
 import { ResearchSection } from "@/components/sections/ResearchSection";
 import { ContactSection } from "@/components/sections/ContactSection";
+import { getPortfolioData } from "@/lib/portfolioDb";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const data = await getPortfolioData();
+
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)]">
-      <Navbar />
+      <Navbar profile={data.profile} />
 
       <main className="flex-1">
         {/* 1. Authentic Personal Hero */}
-        <Hero />
+        <Hero profile={data.profile} metrics={data.metrics} />
 
         {/* 2. Personal CSE Story & Direction */}
-        <AboutSection />
+        <AboutSection profile={data.profile} />
 
         {/* 3. Real Engineering Projects (Problem / Approach / Lessons) */}
-        <FeaturedProjects />
+        <FeaturedProjects projects={data.projects} />
 
         {/* 4. Practical Technical Stack */}
-        <TechStackSection />
+        <TechStackSection skillCategories={data.skills} />
 
         {/* 5. Learning Journey Timeline */}
-        <JourneySection />
+        <JourneySection journeyMilestones={data.journey} />
 
         {/* 6. What I'm Exploring Next */}
         <ExploringSection />
 
         {/* 7. Applied Research Directions */}
-        <ResearchSection />
+        <ResearchSection researchCards={data.research} />
 
         {/* 8. Subtle Interactive AI Playground Callout */}
         <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
@@ -64,10 +69,10 @@ export default function HomePage() {
         </section>
 
         {/* 10. Friendly Contact & Open Invitation */}
-        <ContactSection />
+        <ContactSection profile={data.profile} />
       </main>
 
-      <Footer />
+      <Footer profile={data.profile} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { projects } from "@/data/projects";
+import { projects as defaultProjects } from "@/data/projects";
+import type { Project } from "@/types/portfolio";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -9,7 +10,7 @@ import {
 } from "lucide-react";
 import { Github } from "@/components/ui/BrandIcons";
 
-export function FeaturedProjects() {
+export function FeaturedProjects({ projects = defaultProjects }: { projects?: Project[] }) {
   const featured = projects
     .filter((p) => p.featured)
     .sort((a, b) => (a.featuredOrder || 99) - (b.featuredOrder || 99))
@@ -55,6 +56,17 @@ export function FeaturedProjects() {
                 }`}
             >
               <div className="p-6 sm:p-7 space-y-5">
+                {project.imageUrl && (
+                  <div className="rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-secondary)] aspect-[16/9]">
+                    <img
+                      src={project.imageUrl}
+                      alt={`${project.title} preview`}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
                 {/* Meta & Status Row */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2 text-xs font-mono">

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { FileText, Menu, X } from "lucide-react";
 import { Github, Linkedin } from "@/components/ui/BrandIcons";
 import { ThemeToggle } from "./ThemeToggle";
-import { profile } from "@/data/profile";
+import { profile as defaultProfile } from "@/data/profile";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -18,7 +18,7 @@ const navLinks = [
   { name: "Playground", href: "/playground" },
 ];
 
-export function Navbar() {
+export function Navbar({ profile = defaultProfile }: { profile?: typeof defaultProfile }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();

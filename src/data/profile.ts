@@ -14,7 +14,7 @@ export const profile = {
   },
   "careerVision": {
     "nearTerm": "Complete my undergraduate degree (Dec 2026), keep shipping end-to-end AI/ML projects, and apply for AI/ML internships and international graduate programs in Artificial Intelligence and Machine Learning.",
-    "longTerm": "Grow into an AI/ML engineer and applied researcher who builds reliable, well-evaluated intelligent systems that solve real-world problems."
+    "longTerm": "Become an AI/ML Engineer and applied researcher, specializing in Machine Learning, Deep Learning, and Agentic AI. My goal is to design and build reliable, scalable, and autonomous intelligent systems that can reason, make decisions, use tools, and solve real-world problems through engineering, research, and innovation."
   },
   "audiences": {
     "recruiters": "Hands-on experience taking ML and deep learning models from notebooks to deployed web apps — Flask on Vercel, FastAPI + Docker on Render, Streamlit RAG, and TensorFlow.js in the browser.",

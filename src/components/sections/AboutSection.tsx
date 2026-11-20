@@ -48,7 +48,7 @@ export function AboutSection({ profile = defaultProfile }: { profile?: typeof de
             </h3>
             <p>
               {profile.careerVision?.longTerm?.trim() ||
-                "My goal is to keep growing into a reliable AI/ML Engineer through internships, open-source engineering, and prospective graduate research."}
+                "Become an AI/ML Engineer and applied researcher, specializing in Machine Learning, Deep Learning, and Agentic AI. My goal is to design and build reliable, scalable, and autonomous intelligent systems that can reason, make decisions, use tools, and solve real-world problems through engineering, research, and innovation."}
             </p>
           </div>
         </div>

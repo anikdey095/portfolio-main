@@ -252,6 +252,7 @@ export async function ensurePortfolioInitialized(): Promise<void> {
           {
             $set: {
               subtitle: defaultProfile.subtitle,
+              careerVision: defaultProfile.careerVision,
             },
           }
         ).catch(() => null);

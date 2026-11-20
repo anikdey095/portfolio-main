@@ -71,10 +71,30 @@ async function readLocalSeedFile(): Promise<Partial<AdminPortfolioData>> {
 }
 
 export function getFallbackPortfolioData(): PortfolioData {
+  const fallbackProjects = toPlainJson(defaultProjects);
+  const liveAppCount = fallbackProjects.filter(
+    (p) => Boolean(p.demoUrl && p.demoUrl.trim().length > 0)
+  ).length;
+
+  const dynamicMetrics = toPlainJson(defaultMetrics).map((m) => {
+    const isLiveAppMetric =
+      m.label.toLowerCase().includes("live") ||
+      m.label.toLowerCase().includes("deployed") ||
+      m.label.toLowerCase().includes("web apps");
+
+    if (isLiveAppMetric && liveAppCount > 0) {
+      return {
+        ...m,
+        value: String(liveAppCount),
+      };
+    }
+    return m;
+  });
+
   return {
     profile: toPlainJson(defaultProfile),
-    metrics: toPlainJson(defaultMetrics),
-    projects: toPlainJson(defaultProjects),
+    metrics: dynamicMetrics,
+    projects: fallbackProjects,
     research: toPlainJson(defaultResearch),
     skills: toPlainJson(defaultSkills),
     journey: toPlainJson(defaultJourney),
@@ -227,6 +247,14 @@ export async function ensurePortfolioInitialized(): Promise<void> {
       if (!hasProfile || projectCount === 0 || researchCount === 0) {
         await migrateExistingDataToMongo();
       } else {
+        await ProfileModel.updateOne(
+          { key: "main" },
+          {
+            $set: {
+              subtitle: defaultProfile.subtitle,
+            },
+          }
+        ).catch(() => null);
         globalForSeed.__portfolioSeeded = true;
       }
     })().finally(() => {
@@ -389,10 +417,33 @@ export async function getPortfolioData(): Promise<PortfolioData> {
     ]);
 
     const mappedProfile = mapProfileDoc(profileDoc);
+    const mappedProjects = projectDocs.map(mapProjectDoc);
+    const mappedResearch = researchDocs.map(mapResearchDoc);
+
+    const liveAppCount = mappedProjects.filter(
+      (p) => Boolean(p.demoUrl && p.demoUrl.trim().length > 0)
+    ).length;
+
+    const dynamicMetrics = mappedProfile.metrics.map((m) => {
+      const isLiveAppMetric =
+        m.label.toLowerCase().includes("live") ||
+        m.label.toLowerCase().includes("deployed") ||
+        m.label.toLowerCase().includes("web apps");
+
+      if (isLiveAppMetric && liveAppCount > 0) {
+        return {
+          ...m,
+          value: String(liveAppCount),
+        };
+      }
+      return m;
+    });
+
     return {
       ...mappedProfile,
-      projects: projectDocs.map(mapProjectDoc),
-      research: researchDocs.map(mapResearchDoc),
+      metrics: dynamicMetrics,
+      projects: mappedProjects,
+      research: mappedResearch,
     };
   } catch (err) {
     console.error("getPortfolioData fallback triggered:", sanitizeDbError(err));
@@ -419,10 +470,33 @@ export async function getAdminPortfolioData(): Promise<AdminPortfolioData> {
     ]);
 
   const mappedProfile = mapProfileDoc(profileDoc);
+  const mappedProjects = projectDocs.map(mapProjectDoc);
+  const mappedResearch = researchDocs.map(mapResearchDoc);
+
+  const liveAppCount = mappedProjects.filter(
+    (p) => Boolean(p.demoUrl && p.demoUrl.trim().length > 0)
+  ).length;
+
+  const dynamicMetrics = mappedProfile.metrics.map((m) => {
+    const isLiveAppMetric =
+      m.label.toLowerCase().includes("live") ||
+      m.label.toLowerCase().includes("deployed") ||
+      m.label.toLowerCase().includes("web apps");
+
+    if (isLiveAppMetric && liveAppCount > 0) {
+      return {
+        ...m,
+        value: String(liveAppCount),
+      };
+    }
+    return m;
+  });
+
   return {
     ...mappedProfile,
-    projects: projectDocs.map(mapProjectDoc),
-    research: researchDocs.map(mapResearchDoc),
+    metrics: dynamicMetrics,
+    projects: mappedProjects,
+    research: mappedResearch,
     messages: messageDocs.map(mapMessageDoc),
   };
 }

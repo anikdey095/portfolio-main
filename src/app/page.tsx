@@ -23,7 +23,7 @@ export default async function HomePage() {
 
       <main className="flex-1">
         {/* 1. Authentic Personal Hero */}
-        <Hero profile={data.profile} metrics={data.metrics} />
+        <Hero profile={data.profile} metrics={data.metrics} projects={data.projects} />
 
         {/* 2. Personal CSE Story & Direction */}
         <AboutSection profile={data.profile} />

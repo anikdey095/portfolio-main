@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ArrowRight, Download, Sparkles } from "lucide-react";
 import { profile as defaultProfile } from "@/data/profile";
 import { verifiedMetrics as defaultMetrics } from "@/data/metrics";
-import type { VerifiedMetric } from "@/types/portfolio";
+import type { Project, VerifiedMetric } from "@/types/portfolio";
 import { MobileHeroVisual } from "./MobileHeroVisual";
 
 const NeuralScene = dynamic(
@@ -35,20 +35,41 @@ const heroHighlights = [
 export function Hero({
   profile = defaultProfile,
   metrics = defaultMetrics,
+  projects,
 }: {
   profile?: typeof defaultProfile;
   metrics?: VerifiedMetric[];
+  projects?: Project[];
 }) {
-  const displayMetrics =
+  const liveCount = Array.isArray(projects)
+    ? projects.filter((p) => Boolean(p.demoUrl && p.demoUrl.trim().length > 0)).length
+    : undefined;
+
+  const rawMetrics =
     Array.isArray(metrics) && metrics.length > 0
       ? metrics.slice(0, 3)
       : heroHighlights;
+
+  const displayMetrics = rawMetrics.map((item) => {
+    const isLiveAppMetric =
+      item.label.toLowerCase().includes("live") ||
+      item.label.toLowerCase().includes("deployed") ||
+      item.label.toLowerCase().includes("web apps");
+
+    if (isLiveAppMetric && liveCount !== undefined && liveCount > 0) {
+      return {
+        ...item,
+        value: String(liveCount),
+      };
+    }
+    return item;
+  });
 
   const badgeText = profile.title?.trim() || "CSE Student · Aspiring AI/ML Engineer";
   const heroDescription =
     profile.subtitle?.trim() ||
     profile.bio?.trim() ||
-    "I'm an undergraduate Computer Science student at Metropolitan University exploring Machine Learning, Computer Vision, and RAG systems—learning through real code, honest experiments, and practical engineering.";
+    "A Computer Science and Engineering student at Metropolitan University, passionate about building practical AI solutions through Machine Learning, Deep Learning, Natural Language Processing (NLP), Computer Vision, and Retrieval-Augmented Generation (RAG). Focused on developing intelligent, scalable, and real-world AI applications.";
 
   return (
     <section className="relative min-h-[92vh] flex flex-col justify-between pt-28 pb-10 px-4 sm:px-6 lg:px-8 overflow-hidden">

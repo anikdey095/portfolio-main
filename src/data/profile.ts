@@ -2,7 +2,7 @@ export const profile = {
   "name": "Anik Dey",
   "avatar": "/profile.png",
   "title": "Aspiring AI / ML Engineer",
-  "subtitle": "Building practical AI applications across machine learning, deep learning, NLP, computer vision, and retrieval-augmented generation (RAG).",
+  "subtitle": "A Computer Science and Engineering student at Metropolitan University, passionate about building practical AI solutions through Machine Learning, Deep Learning, Natural Language Processing (NLP), Computer Vision, and Retrieval-Augmented Generation (RAG). Focused on developing intelligent, scalable, and real-world AI applications.",
   "bio": "Computer Science and Engineering undergraduate at Metropolitan University, Sylhet, Bangladesh, and competitive programmer. I build and deploy end-to-end AI applications — from a Random Forest crop recommender and a BiGRU emotion classifier to a multi-PDF RAG chatbot and in-browser object detection — while strengthening my foundations in data structures, algorithms, and neural networks.",
   "location": "Sylhet, Bangladesh",
   "education": {

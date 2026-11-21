@@ -51,10 +51,30 @@ export function ContactSection({ profile = defaultProfile }: { profile?: typeof 
       });
       const result = await res.json();
 
-      if (res.ok && result?.success === true) {
+      if (res.ok && (result?.success === true || result?.saved === true)) {
+        // If server provided forwardKey, forward via client browser to ensure direct email delivery
+        if (result?.forwardKey) {
+          fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              access_key: result.forwardKey,
+              subject: cleanSubject || `Portfolio Inquiry from ${cleanName}`,
+              from_name: cleanName,
+              name: cleanName,
+              email: cleanEmail,
+              replyto: cleanEmail,
+              message: `Name: ${cleanName}\nEmail: ${cleanEmail}\nSubject: ${cleanSubject || "Portfolio Inquiry"}\n\nMessage:\n${cleanMessage}`,
+            }),
+          }).catch(() => {});
+        }
+
         setStatus("success");
         setStatusMessage(
-          result.message || `Your message has been delivered directly to ${profile.socials.email}.`
+          result.message || `Thank you, ${cleanName}! Your message has been received and saved.`
         );
         setFormData({ name: "", email: "", subject: "", message: "" });
         return;

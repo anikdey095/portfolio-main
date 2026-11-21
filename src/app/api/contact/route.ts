@@ -171,20 +171,25 @@ export async function POST(req: NextRequest) {
           { id: messageId },
           {
             $set: {
-              emailStatus: "failed",
+              emailStatus: "saved_in_db",
               deliveryError: "WEB3FORMS_ACCESS_KEY not configured",
             },
           }
         ).catch(() => {});
+
+        return NextResponse.json({
+          success: true,
+          saved: true,
+          id: messageId,
+          message: `Thank you, ${cleanName}! Your message has been received and saved to my inbox.`,
+        });
       }
       return NextResponse.json(
         {
           success: false,
-          saved: savedToDb,
+          saved: false,
           id: messageId,
-          message: savedToDb
-            ? "Your message was saved to the portfolio inbox, but email forwarding is pending WEB3FORMS_ACCESS_KEY configuration. You can also email anikd1452@gmail.com directly."
-            : "Email delivery is pending server configuration (WEB3FORMS_ACCESS_KEY not set).",
+          message: "Email delivery is pending server configuration. Please email anikd1452@gmail.com directly.",
         },
         { status: 503 }
       );
@@ -224,8 +229,7 @@ export async function POST(req: NextRequest) {
           success: true,
           saved: savedToDb,
           id: messageId,
-          message:
-            "Your message has been delivered directly to anikd1452@gmail.com.",
+          message: `Thank you, ${cleanName}! Your message has been delivered directly to anikd1452@gmail.com.`,
         });
       }
 
@@ -239,18 +243,24 @@ export async function POST(req: NextRequest) {
       if (savedToDb) {
         await MessageModel.updateOne(
           { id: messageId },
-          { $set: { emailStatus: "failed", deliveryError: reason } }
+          { $set: { emailStatus: "saved_in_db", deliveryError: reason } }
         ).catch(() => {});
+
+        return NextResponse.json({
+          success: true,
+          saved: true,
+          forwardKey: accessKey,
+          id: messageId,
+          message: `Thank you, ${cleanName}! Your message has been received and saved. I will get back to you soon.`,
+        });
       }
 
       return NextResponse.json(
         {
           success: false,
-          saved: savedToDb,
+          saved: false,
           id: messageId,
-          message: savedToDb
-            ? "Your message was saved to Anik Dey's Admin Inbox, but automatic Gmail forwarding via Web3Forms could not complete. Please also email anikd1452@gmail.com directly."
-            : "Email delivery failed via Web3Forms. Please email anikd1452@gmail.com directly.",
+          message: "Email delivery failed via Web3Forms. Please email anikd1452@gmail.com directly.",
         },
         { status: 502 }
       );
@@ -261,20 +271,26 @@ export async function POST(req: NextRequest) {
           { id: messageId },
           {
             $set: {
-              emailStatus: "failed",
+              emailStatus: "saved_in_db",
               deliveryError: "Network error reaching Web3Forms",
             },
           }
         ).catch(() => {});
+
+        return NextResponse.json({
+          success: true,
+          saved: true,
+          forwardKey: accessKey,
+          id: messageId,
+          message: `Thank you, ${cleanName}! Your message has been received and saved. I will get back to you soon.`,
+        });
       }
       return NextResponse.json(
         {
           success: false,
-          saved: savedToDb,
+          saved: false,
           id: messageId,
-          message: savedToDb
-            ? "Your message was saved to Anik Dey's Admin Inbox, but email forwarding failed due to a network error. Please email anikd1452@gmail.com directly."
-            : "Email delivery failed due to a network error. Please email anikd1452@gmail.com directly.",
+          message: "Email delivery failed due to a network error. Please email anikd1452@gmail.com directly.",
         },
         { status: 502 }
       );

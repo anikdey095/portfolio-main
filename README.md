@@ -8,7 +8,7 @@ This portfolio highlights end-to-end Machine Learning, Deep Learning, NLP, Compu
 - **LinkedIn:** [linkedin.com/in/anik-dey-7723a4329](https://www.linkedin.com/in/anik-dey-7723a4329/)
 - **Email:** [anikd1452@gmail.com](mailto:anikd1452@gmail.com)
 - **Resume:** [public/resume.pdf](./public/resume.pdf) (`/resume.pdf`)
-
+**Live Link** [portfolio.com]https://portfoliofinal-bice.vercel.app/
 ---
 
 ## Key Features

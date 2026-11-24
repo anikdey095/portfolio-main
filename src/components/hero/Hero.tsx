@@ -89,7 +89,7 @@ export function Hero({
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.12]">
               <span className="block text-[#0ea5e9]">Hi, I&apos;m {profile.name},</span>
-              <span className="block text-[var(--text-primary)]">building practical AI solutions for real-world challenges.</span>
+              <span className="block text-[var(--text-primary)]">Turning ideas into intelligent reality.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-xl">
